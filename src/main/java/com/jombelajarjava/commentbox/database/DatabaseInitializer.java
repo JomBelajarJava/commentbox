@@ -3,7 +3,7 @@ package com.jombelajarjava.commentbox.database;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
-import com.jombelajarjava.commentbox.database.entities.Comment;
+import com.jombelajarjava.commentbox.database.entities.CommentEntity;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -25,6 +25,6 @@ public class DatabaseInitializer implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
 //        ObjectifyService.init();  // TODO: use this for prod instead of useDatastoreEmulator()
         useDatastoreEmulator();
-        ObjectifyService.register(Comment.class);
+        ObjectifyService.register(CommentEntity.class);
     }
 }

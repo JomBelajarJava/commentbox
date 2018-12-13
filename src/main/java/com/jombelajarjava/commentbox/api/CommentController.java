@@ -15,14 +15,25 @@ public class CommentController {
     private CommentService commentService;
 
     @GetMapping("/api/threads")
-    public Message testGettingAllThreads() {
+    public Message threads() {
         List<Comment> threads = commentService.getAllThreads();
         return new Message(threads);
     }
 
+    @GetMapping("/api/thread/{threadId}/comments")
+    public Message comments(@PathVariable Long threadId) {
+        List<Comment> replies = commentService.getAllReplies(threadId);
+        return new Message(replies);
+    }
+
     @PostMapping("/api/thread")
-    public void testAddingComment(@RequestBody Comment comment) {
-        commentService.addComment(comment);
+    public void openThread(@RequestBody Comment comment) {
+        commentService.addThread(comment);
+    }
+
+    @PostMapping("/api/thread/{threadId}/comment")
+    public void sendReply(@PathVariable Long threadId, @RequestBody Comment comment) {
+        commentService.addReply(threadId, comment);
     }
 
     @Data

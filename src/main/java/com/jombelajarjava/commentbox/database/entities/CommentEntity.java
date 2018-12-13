@@ -8,12 +8,12 @@ import com.googlecode.objectify.annotation.Index;
 import java.util.Date;
 
 @Entity
-public class Comment {
+public class CommentEntity {
     @Id
     public Long id;
     public String username;
     public String text;
     public Date created;
     @Index
-    public Key<Comment> parentComment;
+    public Key<CommentEntity> threadKey;
 }
