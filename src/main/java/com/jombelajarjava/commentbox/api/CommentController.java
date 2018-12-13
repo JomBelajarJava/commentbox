@@ -1,7 +1,7 @@
 package com.jombelajarjava.commentbox.api;
 
 import com.jombelajarjava.commentbox.comment.CommentService;
-import com.jombelajarjava.commentbox.comment.model.Comment;
+import com.jombelajarjava.commentbox.database.entities.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,16 +1,15 @@
 package com.jombelajarjava.commentbox.comment;
 
 import com.googlecode.objectify.Key;
-import com.jombelajarjava.commentbox.comment.model.Comment;
-import com.jombelajarjava.commentbox.converters.CommentConverter;
-import com.jombelajarjava.commentbox.database.entities.CommentEntity;
+import com.jombelajarjava.commentbox.database.entities.Comment;
 import com.jombelajarjava.commentbox.database.repositories.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.util.List;
 
-import static com.jombelajarjava.commentbox.converters.CommentConverter.toEntity;
+import static java.time.Instant.now;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -19,32 +18,27 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     public List<Comment> getAllThreads() {
-        return commentRepository.findAllThreads().stream()
-                .map(commentEntity -> {
-                    Integer repliesCount = commentRepository.countReplies(commentEntity.id);
-
-                    Comment comment = CommentConverter.toModel(commentEntity);
-                    comment.setRepliesCount(repliesCount);
-
-                    return comment;
+        return commentRepository
+                .findAllThreads().stream()
+                .peek(thread -> {
+                    Integer repliesCount = commentRepository.countReplies(thread.getId());
+                    thread.setRepliesCount(repliesCount);
                 })
                 .collect(toList());
     }
 
     public List<Comment> getAllReplies(Long threadId) {
-        return commentRepository.findAllReplies(threadId).stream()
-                .map(CommentConverter::toModel)
-                .collect(toList());
+        return commentRepository.findAllReplies(threadId);
     }
 
     public void addThread(Comment comment) {
-        commentRepository.insert(toEntity(comment));
+        comment.setCreated(Date.from(now()));
+        commentRepository.insert(comment);
     }
 
     public void addReply(Long threadId, Comment comment) {
-        CommentEntity entity = CommentConverter.toEntity(comment);
-        entity.threadKey = Key.create(CommentEntity.class, threadId);
-
-        commentRepository.insert(entity);
+        comment.setCreated(Date.from(now()));
+        comment.setThreadKey(Key.create(Comment.class, threadId));
+        commentRepository.insert(comment);
     }
 }
