@@ -23,4 +23,10 @@ public class CommentRepository {
                 .filter("parentComment", Key.create(Comment.class, parentId))
                 .list();
     }
+
+    public Key<Comment> insert(Comment comment) {
+        return ofy().save()
+                .entity(comment)
+                .now();
+    }
 }

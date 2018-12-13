@@ -5,8 +5,7 @@ import com.jombelajarjava.commentbox.comment.model.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,9 +20,14 @@ public class CommentController {
         return new Message(threads);
     }
 
+    @PostMapping("/api/thread")
+    public void testAddingComment(@RequestBody Comment comment) {
+        commentService.addComment(comment);
+    }
+
     @Data
     @AllArgsConstructor
     class Message {
-        private List<Comment> data;
+        private Object data;
     }
 }

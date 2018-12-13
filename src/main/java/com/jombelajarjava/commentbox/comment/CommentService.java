@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.jombelajarjava.commentbox.converters.CommentConverter.toEntity;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -25,5 +26,9 @@ public class CommentService {
         return commentRepository.findAllReplies(parentId).stream()
                 .map(CommentConverter::toModel)
                 .collect(toList());
+    }
+
+    public void addComment(Comment comment) {
+        commentRepository.insert(toEntity(comment));
     }
 }
