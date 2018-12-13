@@ -1,0 +1,17 @@
+package com.jombelajarjava.commentbox.database.entities;
+
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+
+import java.util.Date;
+
+@Entity
+public class Comment {
+    @Id
+    public Long id;
+    public String username;
+    public String text;
+    public Date created;
+    public Key<Comment> parentComment;
+}
