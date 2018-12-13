@@ -14,7 +14,7 @@ public class DatabaseInitializer implements ServletContextListener {
     private void useDatastoreEmulator() {
         ObjectifyService.init(new ObjectifyFactory(
                 DatastoreOptions.newBuilder()
-                        .setHost("http://localhost:8484")
+                        .setHost("http://localhost:8081")
                         .setProjectId("hello-225223")
                         .build()
                         .getService()
