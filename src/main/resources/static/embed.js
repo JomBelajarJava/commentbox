@@ -2,30 +2,56 @@
     var baseUrl = 'http://localhost:8080';
     var commentbox = document.getElementById('jombelajarjava-commentbox');
 
-    var showReplies = function (container, replies) {
+    /*
+     * Format comment and append to the list element.
+     */
+    var appendComment = function(list, comment) {
+        var username = document.createElement('p');
+        var bold = document.createElement('b');
+        var usernameText = document.createTextNode(comment.username);
+        bold.appendChild(usernameText);
+        username.appendChild(bold);
+
+        var text = document.createElement('p');
+        var textNode = document.createTextNode(comment.text);
+        text.appendChild(textNode);
+
+        list.appendChild(username);
+        list.appendChild(text);
+    };
+
+    /*
+     * Show replies by making ul element inside li element of the thread.
+     */
+    var showReplies = function (link, replies) {
+        var container = link.parentElement.parentElement;  // li > p > a
         var ul = document.createElement('ul');
 
         for (var i = 0; i < replies.length; i++) {
             var reply = replies[i];
 
             var li = document.createElement('li');
-
-            var commentText = reply.text + ' - ' + reply.username + '.';
-            var comment = document.createTextNode(commentText);
-            li.appendChild(comment);
+            appendComment(li, reply);
 
             ul.appendChild(li);
         }
 
         container.appendChild(ul);
-        container.setAttribute('data-replies-loaded', 'true');
+        link.setAttribute('data-replies-loaded', 'true');
     };
 
-    var hideReplies = function (container) {
+    /*
+     * Hide replies by removing the last element of li element of the thread.
+     */
+    var hideReplies = function (link) {
+        var container = link.parentElement.parentElement;  // li > p > a
         container.removeChild(container.lastChild);
-        container.setAttribute('data-replies-loaded', 'false');
+        link.setAttribute('data-replies-loaded', 'false');
     };
 
+    /*
+     * Request replies from server.
+     */
     var requestReplies = function (link) {
         var url = link.getAttribute('href');
 
@@ -34,22 +60,24 @@
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
-                showReplies(link.parentElement, response.data);
+                showReplies(link, response.data);
             }
         };
         xhr.send();
     };
 
+    /*
+     * Event listener that will load replies if hasn't and hide otherwise.
+     */
     var loadReplies = function (evt) {
         evt.preventDefault();
         var link = evt.target;
-        var container = link.parentElement;
-        var loaded = container.getAttribute('data-replies-loaded');
+        var loaded = link.getAttribute('data-replies-loaded');
 
         if (loaded === 'false') {
             requestReplies(link);
         } else {
-            hideReplies(container);
+            hideReplies(link);
         }
     };
 
@@ -59,21 +87,24 @@
      */
     var createReplyText = function (thread) {
         var replyText = document.createTextNode(thread.repliesCount + ' reply');
+        var url = baseUrl + '/api/thread/' + thread.id + '/comments';
 
-        if (thread.repliesCount > 0) {
-            var url = baseUrl + '/api/thread/' + thread.id + '/comments';
+        var a = document.createElement('a');
+        a.setAttribute('class', 'jombelajarjava-reply-link');
+        a.setAttribute('href', url);
+        a.setAttribute('data-replies-loaded', 'false');
+        a.addEventListener('click', loadReplies);
+        a.appendChild(replyText);
 
-            var a = document.createElement('a');
-            a.setAttribute('class', 'jombelajarjava-reply-link');
-            a.setAttribute('href', url);
-            a.addEventListener('click', loadReplies);
-            a.appendChild(replyText);
+        var p = document.createElement('p');
+        p.appendChild(a);
 
-            return a;
-        }
-        return replyText;
+        return p;
     };
 
+    /*
+     * Show threads by appending ul element into comment box.
+     */
     var showThreads = function (threads) {
         var ul = document.createElement('ul');
 
@@ -81,14 +112,12 @@
             var thread = threads[i];
 
             var li = document.createElement('li');
-            li.setAttribute('data-replies-loaded', 'false');
+            appendComment(li, thread);
 
-            var commentText = thread.text + ' - ' + thread.username + '. ';
-            var comment = document.createTextNode(commentText);
-            li.appendChild(comment);
-
-            var replyText = createReplyText(thread);
-            li.appendChild(replyText);
+            if (thread.repliesCount > 0) {
+                var replyText = createReplyText(thread);
+                li.appendChild(replyText);
+            }
 
             ul.appendChild(li);
         }
@@ -96,6 +125,9 @@
         commentbox.appendChild(ul);
     };
 
+    /*
+     * Request threads from server.
+     */
     var requestThreads = function () {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "http://localhost:8080/api/threads", true);
