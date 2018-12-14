@@ -59,7 +59,7 @@
         var url = link.getAttribute('href');
 
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
+        xhr.open('GET', url, true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
@@ -143,7 +143,7 @@
      */
     var requestThreads = function () {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "http://localhost:8080/api/threads", true);
+        xhr.open('GET', baseUrl + '/api/threads', true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
