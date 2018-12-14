@@ -38,6 +38,8 @@
 
         container.appendChild(ul);
         link.setAttribute('data-replies-loaded', 'true');
+        link.setAttribute('data-prev-text', link.firstChild.nodeValue);
+        link.firstChild.nodeValue = 'Hide replies';
     };
 
     /*
@@ -47,6 +49,7 @@
         var container = link.parentElement.parentElement;  // li > p > a
         container.removeChild(container.lastChild);
         link.setAttribute('data-replies-loaded', 'false');
+        link.firstChild.nodeValue = link.getAttribute('data-prev-text');
     };
 
     /*
@@ -82,11 +85,21 @@
     };
 
     /*
+     * Singular/plural thing.
+     */
+    var chooseWord = function (count) {
+        if (count == 1) {
+            return 'View reply';
+        }
+        return 'View ' + count + ' replies';
+    };
+
+    /*
      * Create reply text according to number of replies. 0 replies is just a
      * text, more than 0 will be a link.
      */
     var createReplyText = function (thread) {
-        var replyText = document.createTextNode(thread.repliesCount + ' reply');
+        var replyText = document.createTextNode(chooseWord(thread.repliesCount));
         var url = baseUrl + '/api/thread/' + thread.id + '/comments';
 
         var a = document.createElement('a');
