@@ -2,10 +2,55 @@
     var baseUrl = 'http://localhost:8080';
     var commentbox = document.getElementById('jombelajarjava-commentbox');
 
-    var showReplies = function (evt) {
+    var showReplies = function (container, replies) {
+        var ul = document.createElement('ul');
+
+        for (var i = 0; i < replies.length; i++) {
+            var reply = replies[i];
+
+            var li = document.createElement('li');
+
+            var commentText = reply.text + ' - ' + reply.username + '.';
+            var comment = document.createTextNode(commentText);
+            li.appendChild(comment);
+
+            ul.appendChild(li);
+        }
+
+        container.appendChild(ul);
+        container.setAttribute('data-replies-loaded', 'true');
+    };
+
+    var hideReplies = function (container) {
+        container.removeChild(container.lastChild);
+        container.setAttribute('data-replies-loaded', 'false');
+    };
+
+    var requestReplies = function (link) {
+        var url = link.getAttribute('href');
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                showReplies(link.parentElement, response.data);
+            }
+        };
+        xhr.send();
+    };
+
+    var loadReplies = function (evt) {
         evt.preventDefault();
-        console.log('Fetching from ' + evt.target.getAttribute('href'));
-        console.log('Parent: ' + evt.target.parentElement.innerHTML);
+        var link = evt.target;
+        var container = link.parentElement;
+        var loaded = container.getAttribute('data-replies-loaded');
+
+        if (loaded === 'false') {
+            requestReplies(link);
+        } else {
+            hideReplies(container);
+        }
     };
 
     /*
@@ -21,7 +66,7 @@
             var a = document.createElement('a');
             a.setAttribute('class', 'jombelajarjava-reply-link');
             a.setAttribute('href', url);
-            a.addEventListener('click', showReplies);
+            a.addEventListener('click', loadReplies);
             a.appendChild(replyText);
 
             return a;
@@ -36,6 +81,7 @@
             var thread = threads[i];
 
             var li = document.createElement('li');
+            li.setAttribute('data-replies-loaded', 'false');
 
             var commentText = thread.text + ' - ' + thread.username + '. ';
             var comment = document.createTextNode(commentText);
