@@ -17,7 +17,14 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     public List<Comment> getAllThreads() {
-        return commentRepository.findAllThreadsWithRepliesCount();
+        List<Comment> threads = commentRepository.findAllThreads();
+
+        for (Comment thread : threads) {
+            Integer repliesCount = commentRepository.countReplies(thread.getId());
+            thread.setRepliesCount(repliesCount);
+        }
+
+        return threads;
     }
 
     public List<Comment> getAllReplies(Long threadId) {

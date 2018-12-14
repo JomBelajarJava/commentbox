@@ -18,19 +18,6 @@ public class CommentRepository {
                 .list();
     }
 
-    public List<Comment> findAllThreadsWithRepliesCount() {
-        return ofy().transact(() -> {
-            List<Comment> threads = findAllThreads();
-
-            for (Comment thread : threads) {
-                Integer repliesCount = countReplies(thread.getId());
-                thread.setRepliesCount(repliesCount);
-            }
-
-            return threads;
-        });
-    }
-
     public List<Comment> findAllReplies(Long threadId) {
         return ofy().load()
                 .type(Comment.class)
