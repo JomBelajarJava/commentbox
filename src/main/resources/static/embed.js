@@ -74,7 +74,7 @@
         return replyText;
     };
 
-    var initThreads = function (threads) {
+    var showThreads = function (threads) {
         var ul = document.createElement('ul');
 
         for (var i = 0; i < threads.length; i++) {
@@ -96,17 +96,17 @@
         commentbox.appendChild(ul);
     };
 
-    var loadThreads = function () {
+    var requestThreads = function () {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "http://localhost:8080/api/threads", true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
-                initThreads(response.data);
+                showThreads(response.data);
             }
         };
         xhr.send();
     };
 
-    loadThreads();
+    requestThreads();
 })();
