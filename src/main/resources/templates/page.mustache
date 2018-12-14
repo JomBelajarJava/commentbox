@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Jom Belajar Java Comment Box</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Projek demo untuk aplikasi comment box menggunakan Spring Boot">
+    <style>
+     main {
+         margin: 20px auto;
+         max-width: 650px;
+         color: #444444;
+     }
+     article {
+         border: 1px solid #c4c4c4;
+         border-radius: 12px;
+         padding: 12px;
+         margin-bottom: 20px;
+     }
+     h2 {
+         margin: 2px;
+     }
+     pre {
+         background-color: #ededed;
+         padding: 16px;
+     }
+     code {
+         background-color: #ededed;
+         padding: 2px 6px;
+     }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Jom Belajar Java Comment Box</h1>
+        <p>Projek demo untuk aplikasi comment box menggunakan Spring Boot</p>
+      </header>
+
+      <article>
+        <h2>Arahan</h2>
+        <p>
+          Tambah line berikut di dalam bahagian <code>&lt;head></code> HTML:
+          <pre><code>{{> commentbox_css}}</code></pre>
+        </p>
+        <p>
+          Kemudian, tambah line berikut di bahagian bawah HTML di atas
+          <code>&lt;/body></code>:
+          <pre><code>{{> commentbox_script}}</code></pre>
+        </p>
+        <p>
+          Akhir sekali, letakkan code berikut di bahagian yang anda mahu
+          letakkan comment box:
+          <pre><code>{{> commentbox_div}}</code></pre>
+        </p>
+      </article>
+    </main>
+  </body>
+</html>

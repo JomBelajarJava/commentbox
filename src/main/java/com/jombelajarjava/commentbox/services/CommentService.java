@@ -10,7 +10,6 @@ import java.sql.Date;
 import java.util.List;
 
 import static java.time.Instant.now;
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class CommentService {
@@ -18,13 +17,7 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     public List<Comment> getAllThreads() {
-        return commentRepository
-                .findAllThreads().stream()
-                .peek(thread -> {
-                    Integer repliesCount = commentRepository.countReplies(thread.getId());
-                    thread.setRepliesCount(repliesCount);
-                })
-                .collect(toList());
+        return commentRepository.findAllThreadsWithRepliesCount();
     }
 
     public List<Comment> getAllReplies(Long threadId) {
