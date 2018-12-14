@@ -1,16 +1,14 @@
-package com.jombelajarjava.commentbox.api;
+package com.jombelajarjava.commentbox.controllers;
 
-import com.jombelajarjava.commentbox.comment.CommentService;
 import com.jombelajarjava.commentbox.database.entities.Comment;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.jombelajarjava.commentbox.services.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-public class CommentController {
+public class ApiController {
     @Autowired
     private CommentService commentService;
 
@@ -34,11 +32,5 @@ public class CommentController {
     @PostMapping("/api/thread/{threadId}/comment")
     public void sendReply(@PathVariable Long threadId, @RequestBody Comment comment) {
         commentService.addReply(threadId, comment);
-    }
-
-    @Data
-    @AllArgsConstructor
-    class Message {
-        private Object data;
     }
 }

@@ -1,4 +1,4 @@
-package com.jombelajarjava.commentbox.comment;
+package com.jombelajarjava.commentbox.services;
 
 import com.googlecode.objectify.Key;
 import com.jombelajarjava.commentbox.database.entities.Comment;
