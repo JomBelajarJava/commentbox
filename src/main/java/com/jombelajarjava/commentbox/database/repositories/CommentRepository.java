@@ -13,6 +13,7 @@ public class CommentRepository {
     public List<Comment> findAllThreads() {
         return ofy().load()
                 .type(Comment.class)
+                .order("-created")
                 .filter("threadKey", null)
                 .list();
     }
@@ -20,6 +21,7 @@ public class CommentRepository {
     public List<Comment> findAllReplies(Long threadId) {
         return ofy().load()
                 .type(Comment.class)
+                .order("created")
                 .filter("threadKey", Key.create(Comment.class, threadId))
                 .list();
     }

@@ -21,6 +21,8 @@ public class Comment {
     private Long id;
     private String username;
     private String text;
+
+    @Index
     private Date created;
 
     @JsonIgnore
