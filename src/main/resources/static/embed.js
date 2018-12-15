@@ -5,9 +5,9 @@
     var threadList;
 
     /*
-     * Format comment and append to the list element.
+     * Format comment, return as list element.
      */
-    var appendComment = function(list, comment) {
+    var createComment = function(comment) {
         var username = document.createElement('p');
         var bold = document.createElement('b');
         var usernameText = document.createTextNode(comment.username);
@@ -18,8 +18,11 @@
         var textNode = document.createTextNode(comment.text);
         text.appendChild(textNode);
 
-        list.appendChild(username);
-        list.appendChild(text);
+        var li = document.createElement('li');
+        li.appendChild(username);
+        li.appendChild(text);
+
+        return li;
     };
 
     /*
@@ -30,11 +33,7 @@
         var ul = document.createElement('ul');
 
         for (var i = 0; i < replies.length; i++) {
-            var reply = replies[i];
-
-            var li = document.createElement('li');
-            appendComment(li, reply);
-
+            var li = createComment(replies[i]);
             ul.appendChild(li);
         }
 
@@ -121,8 +120,7 @@
      * Create list item for thread.
      */
     var createThread = function (thread) {
-        var li = document.createElement('li');
-        appendComment(li, thread);
+        var li = createComment(thread);
 
         if (thread.repliesCount > 0) {
             var replyText = createReplyText(thread);
@@ -213,7 +211,7 @@
     var showThreadForm = function () {
         var usernameInput = document.createElement('input');
         usernameInput.setAttribute('type', 'text');
-        usernameInput.setAttribute('placeholder', 'Username');
+        usernameInput.setAttribute('placeholder', 'Name');
         threadInput['username'] = usernameInput;
 
         var commentInput = document.createElement('textarea');
