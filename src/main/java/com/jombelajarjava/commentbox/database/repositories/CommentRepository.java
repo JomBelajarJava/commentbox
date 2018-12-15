@@ -15,6 +15,7 @@ public class CommentRepository {
                 .type(Comment.class)
                 .order("-created")
                 .filter("threadKey", null)
+                .limit(5)
                 .list();
     }
 
@@ -31,6 +32,7 @@ public class CommentRepository {
                 .type(Comment.class)
                 .order("created")
                 .filter("threadKey", Key.create(Comment.class, threadId))
+                .limit(10)
                 .list();
     }
 
