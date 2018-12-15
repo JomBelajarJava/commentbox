@@ -18,6 +18,14 @@ public class CommentRepository {
                 .list();
     }
 
+    public Comment findThread(Key<Comment> key) {
+        return ofy().load()
+                .type(Comment.class)
+                .filterKey(key)
+                .first()
+                .now();
+    }
+
     public List<Comment> findAllReplies(Long threadId) {
         return ofy().load()
                 .type(Comment.class)

@@ -25,12 +25,14 @@ public class ApiController {
     }
 
     @PostMapping("/api/thread")
-    public void openThread(@RequestBody Comment comment) {
-        commentService.addThread(comment);
+    public Message openThread(@RequestBody Comment comment) {
+        Comment thread = commentService.addThread(comment);
+        return new Message(thread);
     }
 
     @PostMapping("/api/thread/{threadId}/comment")
-    public void sendReply(@PathVariable Long threadId, @RequestBody Comment comment) {
+    public String sendReply(@PathVariable Long threadId, @RequestBody Comment comment) {
         commentService.addReply(threadId, comment);
+        return "OK";
     }
 }

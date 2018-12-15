@@ -1,6 +1,8 @@
 (function () {
     var baseUrl = 'http://localhost:8080';
     var commentbox = document.getElementById('jombelajarjava-commentbox');
+    var threadInput = {};
+    var threadList;
 
     /*
      * Format comment and append to the list element.
@@ -116,26 +118,32 @@
     };
 
     /*
+     * Create list item for thread.
+     */
+    var createThread = function (thread) {
+        var li = document.createElement('li');
+        appendComment(li, thread);
+
+        if (thread.repliesCount > 0) {
+            var replyText = createReplyText(thread);
+            li.appendChild(replyText);
+        }
+
+        return li;
+    };
+
+    /*
      * Show threads by appending ul element into comment box.
      */
     var showThreads = function (threads) {
-        var ul = document.createElement('ul');
+        threadList = document.createElement('ul');
 
         for (var i = 0; i < threads.length; i++) {
-            var thread = threads[i];
-
-            var li = document.createElement('li');
-            appendComment(li, thread);
-
-            if (thread.repliesCount > 0) {
-                var replyText = createReplyText(thread);
-                li.appendChild(replyText);
-            }
-
-            ul.appendChild(li);
+            var li = createThread(threads[i]);
+            threadList.appendChild(li);
         }
 
-        commentbox.appendChild(ul);
+        commentbox.appendChild(threadList);
     };
 
     /*
@@ -153,5 +161,84 @@
         xhr.send();
     };
 
-    requestThreads();
+    /*
+     * Add submitted thread into the list.
+     */
+    var showNewThread = function (thread) {
+        var li = createThread(thread);
+        threadList.insertBefore(li, threadList.firstChild);
+    };
+
+    /*
+     * Submit comment to server to open new thread.
+     */
+    var openThread = function (evt) {
+        evt.preventDefault();
+
+        var data = JSON.stringify({
+            username: threadInput.username.value,
+            text: threadInput.comment.value
+        });
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', baseUrl + '/api/thread', true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                showNewThread(response.data);
+            }
+        };
+        xhr.send(data);
+    };
+
+    /*
+     * Group inputs into a div container.
+     */
+    var createForm = function (children) {
+        var form = document.createElement('div');
+
+        for (var i = 0; i < children.length; i++) {
+            var container = document.createElement('p');
+            container.appendChild(children[i]);
+            form.appendChild(container);
+        }
+
+        return form;
+    };
+
+    /*
+     * Add inputs for comment submission.
+     */
+    var showThreadForm = function () {
+        var usernameInput = document.createElement('input');
+        usernameInput.setAttribute('type', 'text');
+        usernameInput.setAttribute('placeholder', 'Username');
+        threadInput['username'] = usernameInput;
+
+        var commentInput = document.createElement('textarea');
+        commentInput.setAttribute('rows', 4);
+        commentInput.setAttribute('placeholder', 'Write comment');
+        threadInput['comment'] = commentInput;
+
+        var submitText = document.createTextNode('Post comment');
+        var submitButton = document.createElement('a');
+        submitButton.setAttribute('href', '#');
+        submitButton.addEventListener('click', openThread);
+        submitButton.appendChild(submitText);
+        threadInput['submit'] = submitButton;
+
+        var form = createForm([usernameInput, commentInput, submitButton]);
+        commentbox.appendChild(form);
+    };
+
+    /*
+     * Initialize commentbox.
+     */
+    var init = function () {
+        showThreadForm();
+        requestThreads();
+    };
+
+    init();
 })();

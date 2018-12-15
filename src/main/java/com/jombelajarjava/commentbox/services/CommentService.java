@@ -31,9 +31,10 @@ public class CommentService {
         return commentRepository.findAllReplies(threadId);
     }
 
-    public void addThread(Comment comment) {
+    public Comment addThread(Comment comment) {
         comment.setCreated(Date.from(now()));
-        commentRepository.insert(comment);
+        Key<Comment> key = commentRepository.insert(comment);
+        return commentRepository.findThread(key);
     }
 
     public void addReply(Long threadId, Comment comment) {
