@@ -99,7 +99,7 @@
      * Create reply text according to number of replies. 0 replies is just a
      * text, more than 0 will be a link.
      */
-    var createReplyText = function (thread) {
+    var createViewReplyLink = function (thread) {
         var replyText = document.createTextNode(chooseWord(thread.repliesCount));
         var url = baseUrl + '/api/thread/' + thread.id + '/comments';
 
@@ -123,8 +123,8 @@
         var li = createComment(thread);
 
         if (thread.repliesCount > 0) {
-            var replyText = createReplyText(thread);
-            li.appendChild(replyText);
+            var viewReplyLink = createViewReplyLink(thread);
+            li.appendChild(viewReplyLink);
         }
 
         return li;
