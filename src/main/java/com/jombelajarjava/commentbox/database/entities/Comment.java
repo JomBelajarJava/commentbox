@@ -31,4 +31,7 @@ public class Comment {
 
     @Ignore
     private Integer repliesCount;
+
+    @Ignore
+    private String cursorAfter;
 }

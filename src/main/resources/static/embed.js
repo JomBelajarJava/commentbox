@@ -149,7 +149,7 @@
      */
     var requestThreads = function () {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', baseUrl + '/api/threads', true);
+        xhr.open('GET', baseUrl + '/api/threads/latest', true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);

@@ -16,8 +16,8 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public List<Comment> getAllThreads() {
-        List<Comment> threads = commentRepository.findAllThreads();
+    public List<Comment> getLatestThreads() {
+        List<Comment> threads = commentRepository.findLatestThreads();
 
         for (Comment thread : threads) {
             Integer repliesCount = commentRepository.countReplies(thread.getId());
@@ -27,8 +27,8 @@ public class CommentService {
         return threads;
     }
 
-    public List<Comment> getAllReplies(Long threadId) {
-        return commentRepository.findAllReplies(threadId);
+    public List<Comment> getReplies(Long threadId) {
+        return commentRepository.findReplies(threadId);
     }
 
     public Comment addThread(Comment comment) {

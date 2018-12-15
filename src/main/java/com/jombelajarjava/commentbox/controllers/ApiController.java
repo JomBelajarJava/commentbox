@@ -12,15 +12,15 @@ public class ApiController {
     @Autowired
     private CommentService commentService;
 
-    @GetMapping("/api/threads")
-    public Message threads() {
-        List<Comment> threads = commentService.getAllThreads();
+    @GetMapping("/api/threads/latest")
+    public Message latestThreads() {
+        List<Comment> threads = commentService.getLatestThreads();
         return new Message(threads);
     }
 
     @GetMapping("/api/thread/{threadId}/comments")
     public Message comments(@PathVariable Long threadId) {
-        List<Comment> replies = commentService.getAllReplies(threadId);
+        List<Comment> replies = commentService.getReplies(threadId);
         return new Message(replies);
     }
 
