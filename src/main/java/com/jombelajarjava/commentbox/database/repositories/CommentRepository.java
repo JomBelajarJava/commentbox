@@ -8,22 +8,23 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
-import static com.jombelajarjava.commentbox.database.Utils.toList;
+import static com.jombelajarjava.commentbox.database.Utils.take;
 
 @Repository
 public class CommentRepository {
     public List<Comment> findLatestThreads() {
-        Query<Comment> query = ofy().load()
+        Query<Comment> query = ofy()
+                .load()
                 .type(Comment.class)
                 .order("-created")
-                .filter("threadKey", null)
-                .limit(5);
+                .filter("threadKey", null);
 
-        return toList(query);
+        return take(5, query);
     }
 
     public Comment findThread(Key<Comment> key) {
-        return ofy().load()
+        return ofy()
+                .load()
                 .type(Comment.class)
                 .filterKey(key)
                 .first()
@@ -31,24 +32,26 @@ public class CommentRepository {
     }
 
     public List<Comment> findReplies(Long threadId) {
-        Query<Comment> query = ofy().load()
+        Query<Comment> query = ofy()
+                .load()
                 .type(Comment.class)
                 .order("created")
-                .filter("threadKey", Key.create(Comment.class, threadId))
-                .limit(10);
+                .filter("threadKey", Key.create(Comment.class, threadId));
 
-        return toList(query);
+        return take(10, query);
     }
 
     public Integer countReplies(Long threadId) {
-        return ofy().load()
+        return ofy()
+                .load()
                 .type(Comment.class)
                 .filter("threadKey", Key.create(Comment.class, threadId))
                 .count();
     }
 
     public Key<Comment> insert(Comment comment) {
-        return ofy().save()
+        return ofy()
+                .save()
                 .entity(comment)
                 .now();
     }
