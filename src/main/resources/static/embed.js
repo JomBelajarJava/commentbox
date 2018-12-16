@@ -79,56 +79,64 @@
     };
 
     function ReplyForm(context) {
-        var self = this;
+        this.context = context;  // Thread
 
-        self.context = context;  // Thread
+        this.nameInput = null;
+        this.replyInput = null;
+        this.render = null;
+    }
 
-        self.nameInput = null;
-        self.replyInput = null;
-        self.form = null;
-
-        self.unmount = function() {
+    ReplyForm.prototype = {
+        unmount: function() {
             // replace this form with reply link
-            self.context.view().replaceChild(self.context.replyLink, self.form);
-        };
+            this.context.view().replaceChild(
+                this.context.replyLink,
+                this.render
+            );
+        },
 
-        self.cancelListener = function(evt) {
-            evt.preventDefault();
-            self.unmount();
-        };
+        cancelListener: function(context) {
+            return function(evt) {
+                evt.preventDefault();
+                context.unmount();
+            };
+        },
 
-        self.submitListener = function(evt) {
-            evt.preventDefault();
+        submitListener: function(context) {
+            return function(evt) {
+                evt.preventDefault();
 
-            ajax({
-                method: 'POST',
-                url: baseUrl + '/api/thread/' + self.context.id + '/comment',
-                success: function(data) {
-                    self.unmount();
-                },
-                data: {
-                    username: self.nameInput.value,
-                    text: self.replyInput.value
-                }
-            });
-        };
+                ajax({
+                    method: 'POST',
+                    url: baseUrl + '/api/thread/' +
+                        context.context.thread.id + '/comment',
+                    success: function(data) {
+                        context.unmount();
+                    },
+                    data: {
+                        username: context.nameInput.value,
+                        text: context.replyInput.value
+                    }
+                });
+            };
+        },
 
-        self.init = function() {
-            self.nameInput = make('input', {
+        init: function() {
+            this.nameInput = make('input', {
                 type: 'text',
                 placeholder: 'Name'
             });
-            self.replyInput = make('textarea', {
+            this.replyInput = make('textarea', {
                 rows: 4,
                 placeholder: 'Write reply'
             });
 
-            var name = wrap(self.nameInput, 'p');
-            var reply = wrap(self.replyInput, 'p');
+            var name = wrap(this.nameInput, 'p');
+            var reply = wrap(this.replyInput, 'p');
             var cancel = wrap(
                 make('a', {
                     href: '#',
-                    onclick: self.cancelListener,
+                    onclick: this.cancelListener(this),
                     text: 'Cancel'
                 }),
                 'p'
@@ -136,291 +144,289 @@
             var submit = wrap(
                 make('a', {
                     href: '#',
-                    onclick: self.submitListener,
+                    onclick: this.submitListener(this),
                     text: 'Post reply'
                 }),
                 'p'
             );
 
-            self.form = group([name, reply, cancel, submit], 'div');
-        };
+            this.render = group([name, reply, cancel, submit], 'div');
+        },
 
-        self.view = function() {
-            if (self.form === null) {
-                self.init();
+        view: function() {
+            if (this.render === null) {
+                this.init();
             }
+            return this.render;
+        },
 
-            return self.form;
-        };
-
-        self.mount = function() {
+        mount: function() {
             // replace reply link with this form
-            self.context.view().replaceChild(
-                self.view(),
-                self.context.replyLink
+            this.context.view().replaceChild(
+                this.view(),
+                this.context.replyLink
             );
-        };
-    }
+        }
+    };
 
     function Reply(context, reply) {
-        var self = this;
-        self.context = context;  // ReplyList
-        self.id = reply.id;
-        self.username = reply.username;
-        self.text = reply.text;
-        self.created = reply.created;
-        self.cursorAfter = reply.cursorAfter;
-
-        self.view = function() {
-            var name = wrap(make('b', {text: self.username}), 'p');
-            var text = make('p' , {text: self.text});
-            return group([name, text], 'li');
-        };
-
-        self.mount = function() {
-            self.context.list.appendChild(self.view());
-        };
+        this.context = context;  // ReplyList
+        this.reply = reply;
     }
+
+    Reply.prototype = {
+        view: function() {
+            var name = wrap(make('b', {text: this.reply.username}), 'p');
+            var text = make('p' , {text: this.reply.text});
+            return group([name, text], 'li');
+        },
+
+        mount: function() {
+            this.context.view().appendChild(this.view());
+        }
+    };
 
     function ReplyList(context, replies) {
-        var self = this;
+        this.context = context;  // Thread
+        this.replies = [];
+        this.render = null;
 
-        self.context = context;  // Thread
-
-        self.replies = (function() {
-            var result = [];
-            for (var i = 0; i < replies.length; i++) {
-                var reply = new Reply(self, replies[i]);
-                result.push(reply);
-            }
-            return result;
-        })();
-
-        self.list = null;
-
-        self.init = function() {
-            self.list = make('ul');
-            for (var i = 0; i < self.replies.length; i++) {
-                self.replies[i].mount();
-            }
-        };
-
-        self.view = function() {
-            if (self.list === null) {
-                self.init();
-            }
-            return self.list;
-        };
-
-        self.mount = function() {
-            self.context.view().appendChild(self.view());
-        };
-
-        self.unmount = function() {
-            self.context.container.removeChild(self.list);
-        };
+        for (var i = 0; i < replies.length; i++) {
+            var reply = new Reply(this, replies[i]);
+            this.replies.push(reply);
+        }
     }
 
+    ReplyList.prototype = {
+        init: function() {
+            this.render = make('ul');
+            for (var i = 0; i < this.replies.length; i++) {
+                this.replies[i].mount();
+            }
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
+        },
+
+        mount: function() {
+            this.context.view().appendChild(this.view());
+        },
+
+        unmount: function() {
+            this.context.view().removeChild(this.view());
+        }
+    };
+
     function Thread(context, thread) {
-        var self = this;
+        this.context = context;  // ThreadList
+        this.thread = thread;
 
-        self.context = context;  // ThreadList
-        self.id = thread.id;
-        self.username = thread.username;
-        self.text = thread.text;
-        self.created = thread.created;
-        self.repliesCount = thread.repliesCount;
-        self.cursorAfter = thread.cursorAfter;
+        this.render = null;
+        this.viewReplyLink = null;
+        this.replyLink = null;
+        this.replyList = null;
 
-        self.viewReplyLink = null;
-        self.container = null;
-        self.replyLink = null;
-        self.replyList = null;
+        this.repliesLoaded = false;
+    }
 
-        self.repliesLoaded = false;
-
-        self.chooseWord = function() {
-            if (self.repliesCount === 0) {
+    Thread.prototype = {
+        chooseWord: function() {
+            if (this.thread.repliesCount === 0 ||
+                this.thread.repliesCount === null) {
                 return '';
-            } else if (self.repliesCount === 1) {
+            } else if (this.thread.repliesCount === 1) {
                 return 'View reply';
             }
-            return 'View ' + self.repliesCount + ' replies';
-        };
+            return 'View ' + this.thread.repliesCount + ' replies';
+        },
 
-        self.hideReplies = function() {
-            self.replyList.unmount();
-            self.viewReplyLink.firstChild.nodeValue = self.chooseWord();
-            self.repliesLoaded = false;
-        };
+        hideReplies: function() {
+            this.replyList.unmount();
+            this.viewReplyLink.firstChild.nodeValue = this.chooseWord();
+            this.repliesLoaded = false;
+        },
 
-        self.showReplies = function(replies) {
-            self.replyList = new ReplyList(self, replies);
-            self.replyList.mount();
-            self.viewReplyLink.firstChild.nodeValue = 'Hide replies';
-            self.repliesLoaded = true;
-        };
+        showReplies: function(context) {
+            return function(replies) {
+                context.replyList = new ReplyList(context, replies);
+                context.replyList.mount();
+                context.viewReplyLink.firstChild.nodeValue = 'Hide replies';
+                context.repliesLoaded = true;
+            };
+        },
 
-        self.viewReplyListener = function(evt) {
-            evt.preventDefault();
+        viewReplyListener: function(context) {
+            return function(evt) {
+                evt.preventDefault();
 
-            if (self.repliesLoaded) {
-                self.hideReplies();
-            } else {
-                ajax({
-                    method: 'GET',
-                    url: baseUrl + '/api/thread/' + self.id + '/comments',
-                    success: self.showReplies,
-                    parse: true
-                });
-            }
-        };
+                if (context.repliesLoaded) {
+                    context.hideReplies();
+                } else {
+                    ajax({
+                        method: 'GET',
+                        url: baseUrl + '/api/thread/' +
+                            context.thread.id + '/comments',
+                        success: context.showReplies(context),
+                        parse: true
+                    });
+                }
+            };
+        },
 
-        self.replyListener = function(evt) {
-            evt.preventDefault();
+        replyListener: function(context) {
+            return function(evt) {
+                evt.preventDefault();
 
-            self.replyForm = new ReplyForm(self);
-            self.replyForm.mount();
-        };
+                context.replyForm = new ReplyForm(context);
+                context.replyForm.mount();
+            };
+        },
 
-        self.init = function() {
-            self.viewReplyLink = make('a', {
+        init: function() {
+            this.viewReplyLink = make('a', {
                 class: 'jombelajarjava-view-reply-link',
                 href: '#',
-                onclick: self.viewReplyListener,
-                text: self.chooseWord()
+                onclick: this.viewReplyListener(this),
+                text: this.chooseWord()
             });
 
-            self.replyLink = wrap(
+            this.replyLink = wrap(
                 make('a', {
                     href: '#',
-                    onclick: self.replyListener,
+                    onclick: this.replyListener(this),
                     text: 'Reply'
                 }),
                 'p'
             );
 
-            var name = wrap(make('b', {text: self.username}), 'p');
-            var text = make('p' , {text: self.text});
-            var viewReply = wrap(self.viewReplyLink, 'p');
+            var name = wrap(make('b', {text: this.thread.username}), 'p');
+            var text = make('p' , {text: this.thread.text});
+            var viewReply = wrap(this.viewReplyLink, 'p');
 
-            var elements = [name, text, viewReply, self.replyLink];
+            var elements = [name, text, viewReply, this.replyLink];
 
-            self.container = group(elements, 'li');
-        };
+            this.render = group(elements, 'li');
+        },
 
-        self.view = function() {
-            if (self.container === null) {
-                self.init();
+        view: function() {
+            if (this.render === null) {
+                this.init();
             }
-            return self.container;
-        };
+            return this.render;
+        },
 
-        self.mount = function() {
-            self.context.list.appendChild(self.view());
-        };
-    }
+        mount: function() {
+            this.context.view().appendChild(this.view());
+        }
+    };
 
     function ThreadList(context, threads) {
-        var self = this;
         context['threadList'] = this;
 
-        self.context = context;
-        self.threads = (function() {
-            var result = [];
-            for (var i = 0; i < threads.length; i++) {
-                var thread = new Thread(self, threads[i]);
-                result.push(thread);
-            }
-            return result;
-        })();
+        this.context = context;
+        this.threads = [];
+        this.render = null;
 
-        self.list = null;
-
-        self.prepend = function(thread) {
-            var t = new Thread(self, thread);
-            self.threads.unshift(thread);
-            self.list.insertBefore(t.view(), self.list.firstChild);
-        };
-
-        self.init = function() {
-            self.list = make('ul');
-            for (var i = 0; i < self.threads.length; i++) {
-                self.threads[i].mount();
-            }
-        };
-
-        self.view = function() {
-            if (self.list === null) {
-                self.init();
-            }
-            return self.list;
-        };
-
-        self.mount = function() {
-            self.context.root.appendChild(self.view());
-        };
+        for (var i = 0; i < threads.length; i++) {
+            var thread = new Thread(this, threads[i]);
+            this.threads.push(thread);
+        }
     }
 
+    ThreadList.prototype = {
+        prepend: function(data) {
+            var thread = new Thread(this, data);
+            this.threads.unshift(data);
+            this.render.insertBefore(thread.view(), this.render.firstChild);
+        },
+
+        init: function() {
+            this.render = make('ul');
+            for (var i = 0; i < this.threads.length; i++) {
+                this.threads[i].mount();
+            }
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
+        },
+
+        mount: function() {
+            this.context.root.appendChild(this.view());
+        }
+    };
+
     function ThreadForm(context) {
-        var self = this;
         context['threadForm'] = this;
 
-        self.context = context;
-        self.usernameInput = null;
-        self.commentInput = null;
-        self.submitButton = null;
+        this.context = context;
+        this.usernameInput = null;
+        this.commentInput = null;
+        this.submitButton = null;
+    }
 
-        self.showNewThread = function(thread) {
-            self.context.threadList.prepend(thread);
-            self.commentInput.value = '';
-        };
+    ThreadForm.prototype = {
+        showNewThread: function(context) {
+            return function(thread) {
+                context.context.threadList.prepend(thread);
+                context.commentInput.value = '';
+            };
+        },
 
-        self.openThread = function(evt) {
-            evt.preventDefault();
+        openThread: function(context) {
+            return function(evt) {
+                evt.preventDefault();
 
-            ajax({
-                method: 'POST',
-                url: baseUrl + '/api/thread',
-                success: self.showNewThread,
-                parse: true,
-                data: {
-                    username: self.usernameInput.value,
-                    text: self.commentInput.value
-                }
-            });
-        };
+                ajax({
+                    method: 'POST',
+                    url: baseUrl + '/api/thread',
+                    success: context.showNewThread(context),
+                    parse: true,
+                    data: {
+                        username: context.usernameInput.value,
+                        text: context.commentInput.value
+                    }
+                });
+            };
+        },
 
-        self.init = function() {
-            self.usernameInput = make( 'input', {
+        init: function() {
+            this.usernameInput = make( 'input', {
                 type: 'text',
                 placeholder: 'Name'
             });
 
-            self.commentInput = make('textarea', {
+            this.commentInput = make('textarea', {
                 rows: 4,
                 placeholder: 'Write comment'
             });
 
-            self.submitButton = make('a', {
+            this.submitButton = make('a', {
                 href: '#',
-                onclick: self.openThread,
+                onclick: this.openThread(this),
                 text: 'Post comment'
             });
-        };
+        },
 
-        self.view = function() {
-            self.init();
-            var username = wrap(self.usernameInput, 'p');
-            var comment = wrap(self.commentInput, 'p');
-            var submit = wrap(self.submitButton, 'p');
+        view: function() {
+            this.init();
+            var username = wrap(this.usernameInput, 'p');
+            var comment = wrap(this.commentInput, 'p');
+            var submit = wrap(this.submitButton, 'p');
             return group([username, comment, submit], 'div');
-        };
+        },
 
-        this.mount = function () {
-            self.context.root.appendChild(self.view());
-        };
-    }
+        mount: function () {
+            this.context.root.appendChild(this.view());
+        }
+    };
 
     var init = function() {
         var threadForm = new ThreadForm(context);
