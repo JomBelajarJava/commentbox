@@ -1,6 +1,9 @@
 (function () {
     var baseUrl = 'http://localhost:8080';
     var context = {
+        threadForm: null,
+        threadList: null,
+        replyForm: null,
         view: document.getElementById('jombelajarjava-commentbox')
     };
 
@@ -170,6 +173,8 @@
                 this.context.replyLink,
                 getView(this)
             );
+
+            context.replyForm = null;
         },
     };
 
@@ -216,6 +221,7 @@
 
         unmount: function() {
             getView(this.context).removeChild(getView(this));
+            this.context.replyList = null;
         }
     };
 
@@ -279,8 +285,11 @@
             return function(evt) {
                 evt.preventDefault();
 
-                self.replyForm = new ReplyForm(self);
-                self.replyForm.mount();
+                if (context.replyForm !== null) {
+                    context.replyForm.unmount();
+                }
+                context.replyForm = new ReplyForm(self);
+                context.replyForm.mount();
             };
         },
 
@@ -316,7 +325,7 @@
     };
 
     function ThreadList(context, threads) {
-        context['threadList'] = this;
+        context.threadList = this;
 
         this.context = context;
         this.threads = [];
@@ -348,7 +357,7 @@
     };
 
     function ThreadForm(context) {
-        context['threadForm'] = this;
+        context.threadForm = this;
 
         this.context = context;
         this.usernameInput = null;
