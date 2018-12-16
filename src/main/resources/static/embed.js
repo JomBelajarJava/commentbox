@@ -95,27 +95,27 @@
             );
         },
 
-        cancelListener: function(context) {
+        cancelListener: function(self) {
             return function(evt) {
                 evt.preventDefault();
-                context.unmount();
+                self.unmount();
             };
         },
 
-        submitListener: function(context) {
+        submitListener: function(self) {
             return function(evt) {
                 evt.preventDefault();
 
                 ajax({
                     method: 'POST',
                     url: baseUrl + '/api/thread/' +
-                        context.context.thread.id + '/comment',
+                        self.context.thread.id + '/comment',
                     success: function(data) {
-                        context.unmount();
+                        self.unmount();
                     },
                     data: {
-                        username: context.nameInput.value,
-                        text: context.replyInput.value
+                        username: self.nameInput.value,
+                        text: self.replyInput.value
                     }
                 });
             };
@@ -267,30 +267,30 @@
             };
         },
 
-        viewReplyListener: function(context) {
+        viewReplyListener: function(self) {
             return function(evt) {
                 evt.preventDefault();
 
-                if (context.repliesLoaded) {
-                    context.hideReplies();
+                if (self.repliesLoaded) {
+                    self.hideReplies();
                 } else {
                     ajax({
                         method: 'GET',
                         url: baseUrl + '/api/thread/' +
-                            context.thread.id + '/comments',
-                        success: context.showReplies(context),
+                            self.thread.id + '/comments',
+                        success: self.showReplies(self),
                         parse: true
                     });
                 }
             };
         },
 
-        replyListener: function(context) {
+        replyListener: function(self) {
             return function(evt) {
                 evt.preventDefault();
 
-                context.replyForm = new ReplyForm(context);
-                context.replyForm.mount();
+                self.replyForm = new ReplyForm(self);
+                self.replyForm.mount();
             };
         },
 
@@ -389,18 +389,18 @@
             };
         },
 
-        openThread: function(context) {
+        openThread: function(self) {
             return function(evt) {
                 evt.preventDefault();
 
                 ajax({
                     method: 'POST',
                     url: baseUrl + '/api/thread',
-                    success: context.showNewThread(context),
+                    success: self.showNewThread(self),
                     parse: true,
                     data: {
-                        username: context.usernameInput.value,
-                        text: context.commentInput.value
+                        username: self.usernameInput.value,
+                        text: self.commentInput.value
                     }
                 });
             };
