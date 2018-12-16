@@ -1,7 +1,7 @@
 (function () {
     var baseUrl = 'http://localhost:8080';
     var context = {
-        render: document.getElementById('jombelajarjava-commentbox')
+        view: document.getElementById('jombelajarjava-commentbox')
     };
 
     // TODO: remove this
@@ -18,10 +18,10 @@
      * Get view rendered by the component.
      */
     var getView = function(component) {
-        if (component.render === null) {
-            component.init();
+        if (component.view === null) {
+            component.render();
         }
-        return component.render;
+        return component.view;
     };
 
     /*
@@ -94,7 +94,7 @@
 
         this.nameInput = null;
         this.replyInput = null;
-        this.render = null;
+        this.view = null;
     }
 
     ReplyForm.prototype = {
@@ -124,7 +124,7 @@
             };
         },
 
-        init: function() {
+        render: function() {
             this.nameInput = make('input', {
                 type: 'text',
                 placeholder: 'Name'
@@ -153,7 +153,7 @@
                 'p'
             );
 
-            this.render = group([name, reply, cancel, submit], 'div');
+            this.view = group([name, reply, cancel, submit], 'div');
         },
 
         mount: function() {
@@ -176,14 +176,14 @@
     function Reply(context, reply) {
         this.context = context;  // ReplyList
         this.reply = reply;
-        this.render = null;
+        this.view = null;
     }
 
     Reply.prototype = {
-        init: function() {
+        render: function() {
             var name = wrap(make('b', {text: this.reply.username}), 'p');
             var text = make('p' , {text: this.reply.text});
-            this.render = group([name, text], 'li');
+            this.view = group([name, text], 'li');
         },
 
         mount: function() {
@@ -194,7 +194,7 @@
     function ReplyList(context, replies) {
         this.context = context;  // Thread
         this.replies = [];
-        this.render = null;
+        this.view = null;
 
         for (var i = 0; i < replies.length; i++) {
             var reply = new Reply(this, replies[i]);
@@ -203,8 +203,8 @@
     }
 
     ReplyList.prototype = {
-        init: function() {
-            this.render = make('ul');
+        render: function() {
+            this.view = make('ul');
             for (var i = 0; i < this.replies.length; i++) {
                 this.replies[i].mount();
             }
@@ -223,7 +223,7 @@
         this.context = context;  // ThreadList
         this.thread = thread;
 
-        this.render = null;
+        this.view = null;
         this.viewReplyLink = null;
         this.replyLink = null;
         this.replyList = null;
@@ -284,7 +284,7 @@
             };
         },
 
-        init: function() {
+        render: function() {
             this.viewReplyLink = make('a', {
                 class: 'jombelajarjava-view-reply-link',
                 href: '#',
@@ -307,7 +307,7 @@
 
             var elements = [name, text, viewReply, this.replyLink];
 
-            this.render = group(elements, 'li');
+            this.view = group(elements, 'li');
         },
 
         mount: function() {
@@ -320,7 +320,7 @@
 
         this.context = context;
         this.threads = [];
-        this.render = null;
+        this.view = null;
 
         for (var i = 0; i < threads.length; i++) {
             var thread = new Thread(this, threads[i]);
@@ -335,8 +335,8 @@
             getView(this).insertBefore(getView(thread), getView(this).firstChild);
         },
 
-        init: function() {
-            this.render = make('ul');
+        render: function() {
+            this.view = make('ul');
             for (var i = 0; i < this.threads.length; i++) {
                 this.threads[i].mount();
             }
@@ -354,7 +354,7 @@
         this.usernameInput = null;
         this.commentInput = null;
         this.submitButton = null;
-        this.render = null;
+        this.view = null;
     }
 
     ThreadForm.prototype = {
@@ -382,7 +382,7 @@
             };
         },
 
-        init: function() {
+        render: function() {
             this.usernameInput = make( 'input', {
                 type: 'text',
                 placeholder: 'Name'
@@ -403,7 +403,7 @@
             var comment = wrap(this.commentInput, 'p');
             var submit = wrap(this.submitButton, 'p');
 
-            this.render = group([username, comment, submit], 'div');
+            this.view = group([username, comment, submit], 'div');
         },
 
         mount: function () {
