@@ -1,7 +1,7 @@
 (function () {
     var baseUrl = 'http://localhost:8080';
     var context = {
-        root: document.getElementById('jombelajarjava-commentbox')
+        render: document.getElementById('jombelajarjava-commentbox')
     };
 
     // TODO: remove this
@@ -11,6 +11,17 @@
         ul.appendChild(comment);
 
         container.parentElement.replaceChild(ul, container);
+    };
+
+
+    /*
+     * Get view rendered by the component.
+     */
+    var getView = function(component) {
+        if (component.render === null) {
+            component.init();
+        }
+        return component.render;
     };
 
     /*
@@ -87,14 +98,6 @@
     }
 
     ReplyForm.prototype = {
-        unmount: function() {
-            // replace this form with reply link
-            this.context.view().replaceChild(
-                this.context.replyLink,
-                this.render
-            );
-        },
-
         cancelListener: function(self) {
             return function(evt) {
                 evt.preventDefault();
@@ -153,20 +156,21 @@
             this.render = group([name, reply, cancel, submit], 'div');
         },
 
-        view: function() {
-            if (this.render === null) {
-                this.init();
-            }
-            return this.render;
-        },
-
         mount: function() {
             // replace reply link with this form
-            this.context.view().replaceChild(
-                this.view(),
+            getView(this.context).replaceChild(
+                getView(this),
                 this.context.replyLink
             );
-        }
+        },
+
+        unmount: function() {
+            // replace this form with reply link
+            getView(this.context).replaceChild(
+                this.context.replyLink,
+                getView(this)
+            );
+        },
     };
 
     function Reply(context, reply) {
@@ -182,15 +186,8 @@
             this.render = group([name, text], 'li');
         },
 
-        view: function() {
-            if (this.render === null) {
-                this.init();
-            }
-            return this.render;
-        },
-
         mount: function() {
-            this.context.view().appendChild(this.view());
+            getView(this.context).appendChild(getView(this));
         }
     };
 
@@ -213,19 +210,12 @@
             }
         },
 
-        view: function() {
-            if (this.render === null) {
-                this.init();
-            }
-            return this.render;
-        },
-
         mount: function() {
-            this.context.view().appendChild(this.view());
+            getView(this.context).appendChild(getView(this));
         },
 
         unmount: function() {
-            this.context.view().removeChild(this.view());
+            getView(this.context).removeChild(getView(this));
         }
     };
 
@@ -320,15 +310,8 @@
             this.render = group(elements, 'li');
         },
 
-        view: function() {
-            if (this.render === null) {
-                this.init();
-            }
-            return this.render;
-        },
-
         mount: function() {
-            this.context.view().appendChild(this.view());
+            getView(this.context).appendChild(getView(this));
         }
     };
 
@@ -349,7 +332,7 @@
         prepend: function(data) {
             var thread = new Thread(this, data);
             this.threads.unshift(data);
-            this.render.insertBefore(thread.view(), this.render.firstChild);
+            this.render.insertBefore(getView(thread), getView(this).firstChild);
         },
 
         init: function() {
@@ -359,15 +342,8 @@
             }
         },
 
-        view: function() {
-            if (this.render === null) {
-                this.init();
-            }
-            return this.render;
-        },
-
         mount: function() {
-            this.context.root.appendChild(this.view());
+            getView(this.context).appendChild(getView(this));
         }
     };
 
@@ -430,18 +406,14 @@
             this.render = group([username, comment, submit], 'div');
         },
 
-        view: function() {
-            if (this.render === null) {
-                this.init();
-            }
-            return this.render;
-        },
-
         mount: function () {
-            this.context.root.appendChild(this.view());
+            getView(this.context).appendChild(getView(this));
         }
     };
 
+    /*
+     * Initialize comment box.
+     */
     var init = function() {
         var threadForm = new ThreadForm(context);
         threadForm.mount();
