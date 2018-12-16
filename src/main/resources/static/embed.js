@@ -1,241 +1,460 @@
 (function () {
     var baseUrl = 'http://localhost:8080';
-    var commentbox = document.getElementById('jombelajarjava-commentbox');
-    var threadInput = {};
-    var threadList;
-
-    /*
-     * Format comment, return as list element.
-     */
-    var createComment = function(comment) {
-        var username = document.createElement('p');
-        var bold = document.createElement('b');
-        var usernameText = document.createTextNode(comment.username);
-        bold.appendChild(usernameText);
-        username.appendChild(bold);
-
-        var text = document.createElement('p');
-        var textNode = document.createTextNode(comment.text);
-        text.appendChild(textNode);
-
-        var li = document.createElement('li');
-        li.appendChild(username);
-        li.appendChild(text);
-
-        return li;
+    var context = {
+        root: document.getElementById('jombelajarjava-commentbox')
     };
 
-    /*
-     * Show replies by making ul element inside li element of the thread.
-     */
-    var showReplies = function (link, replies) {
-        var container = link.parentElement.parentElement;  // li > p > a
+    // TODO: remove this
+    var persistReply = function (container, name, reply) {
+        var comment = createComment({username: name, text: reply});
         var ul = document.createElement('ul');
+        ul.appendChild(comment);
 
-        for (var i = 0; i < replies.length; i++) {
-            var li = createComment(replies[i]);
-            ul.appendChild(li);
-        }
-
-        container.appendChild(ul);
-        link.setAttribute('data-replies-loaded', 'true');
-        link.setAttribute('data-prev-text', link.firstChild.nodeValue);
-        link.firstChild.nodeValue = 'Hide replies';
+        container.parentElement.replaceChild(ul, container);
     };
 
     /*
-     * Hide replies by removing the last element of li element of the thread.
+     * Make an AJAX request. Takes argument object with properties:
+     * method, url, success, data, parse
      */
-    var hideReplies = function (link) {
-        var container = link.parentElement.parentElement;  // li > p > a
-        container.removeChild(container.lastChild);
-        link.setAttribute('data-replies-loaded', 'false');
-        link.firstChild.nodeValue = link.getAttribute('data-prev-text');
-    };
-
-    /*
-     * Request replies from server.
-     */
-    var requestReplies = function (link) {
-        var url = link.getAttribute('href');
-
+    var ajax = function(args) {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                showReplies(link, response.data);
-            }
-        };
-        xhr.send();
-    };
-
-    /*
-     * Event listener that will load replies if hasn't and hide otherwise.
-     */
-    var loadReplies = function (evt) {
-        evt.preventDefault();
-        var link = evt.target;
-        var loaded = link.getAttribute('data-replies-loaded');
-
-        if (loaded === 'false') {
-            requestReplies(link);
-        } else {
-            hideReplies(link);
-        }
-    };
-
-    /*
-     * Singular/plural thing.
-     */
-    var chooseWord = function (count) {
-        if (count == 1) {
-            return 'View reply';
-        }
-        return 'View ' + count + ' replies';
-    };
-
-    /*
-     * Create reply text according to number of replies. 0 replies is just a
-     * text, more than 0 will be a link.
-     */
-    var createViewReplyLink = function (thread) {
-        var replyText = document.createTextNode(chooseWord(thread.repliesCount));
-        var url = baseUrl + '/api/thread/' + thread.id + '/comments';
-
-        var a = document.createElement('a');
-        a.setAttribute('class', 'jombelajarjava-reply-link');
-        a.setAttribute('href', url);
-        a.setAttribute('data-replies-loaded', 'false');
-        a.addEventListener('click', loadReplies);
-        a.appendChild(replyText);
-
-        var p = document.createElement('p');
-        p.appendChild(a);
-
-        return p;
-    };
-
-    /*
-     * Create list item for thread.
-     */
-    var createThread = function (thread) {
-        var li = createComment(thread);
-
-        if (thread.repliesCount > 0) {
-            var viewReplyLink = createViewReplyLink(thread);
-            li.appendChild(viewReplyLink);
-        }
-
-        return li;
-    };
-
-    /*
-     * Show threads by appending ul element into comment box.
-     */
-    var showThreads = function (threads) {
-        threadList = document.createElement('ul');
-
-        for (var i = 0; i < threads.length; i++) {
-            var li = createThread(threads[i]);
-            threadList.appendChild(li);
-        }
-
-        commentbox.appendChild(threadList);
-    };
-
-    /*
-     * Request threads from server.
-     */
-    var requestThreads = function () {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', baseUrl + '/api/threads/latest', true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                showThreads(response.data);
-            }
-        };
-        xhr.send();
-    };
-
-    /*
-     * Add submitted thread into the list.
-     */
-    var showNewThread = function (thread) {
-        var li = createThread(thread);
-        threadList.insertBefore(li, threadList.firstChild);
-    };
-
-    /*
-     * Submit comment to server to open new thread.
-     */
-    var openThread = function (evt) {
-        evt.preventDefault();
-
-        var data = JSON.stringify({
-            username: threadInput.username.value,
-            text: threadInput.comment.value
-        });
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', baseUrl + '/api/thread', true);
+        xhr.open(args.method, args.url, true);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                showNewThread(response.data);
+                if (args.parse) {
+                    var response = JSON.parse(xhr.responseText);
+                    args.success(response.data);
+                } else {
+                    args.success(xhr.responseText);
+                }
             }
         };
-        xhr.send(data);
+        xhr.send(JSON.stringify(args.data));
     };
 
     /*
-     * Group inputs into a div container.
+     * Create HTML element from tagName and attributes. 'onclick' attribute will
+     * add as event listener. 'text' attribute will be the text node. Other
+     * attributes will set as normal attributes.
      */
-    var createForm = function (children) {
-        var form = document.createElement('div');
-
-        for (var i = 0; i < children.length; i++) {
-            var container = document.createElement('p');
-            container.appendChild(children[i]);
-            form.appendChild(container);
+    var make = function(tagName, attributes) {
+        var element = document.createElement(tagName);
+        for (var prop in attributes) {
+            if (prop === 'onclick') {
+                element.addEventListener('click', attributes[prop]);
+            } else if (prop === 'text') {
+                var text = document.createTextNode(attributes[prop]);
+                element.appendChild(text);
+            } else {
+                element.setAttribute(prop, attributes[prop]);
+            }
         }
 
-        return form;
+        return element;
     };
 
     /*
-     * Add inputs for comment submission.
+     * Wrap node inside a new element with given tagName and attributes.
      */
-    var showThreadForm = function () {
-        var usernameInput = document.createElement('input');
-        usernameInput.setAttribute('type', 'text');
-        usernameInput.setAttribute('placeholder', 'Name');
-        threadInput['username'] = usernameInput;
+    var wrap = function(node, tagName, attributes) {
+        var wrapper = make(tagName, attributes);
+        wrapper.appendChild(node);
 
-        var commentInput = document.createElement('textarea');
-        commentInput.setAttribute('rows', 4);
-        commentInput.setAttribute('placeholder', 'Write comment');
-        threadInput['comment'] = commentInput;
-
-        var submitText = document.createTextNode('Post comment');
-        var submitButton = document.createElement('a');
-        submitButton.setAttribute('href', '#');
-        submitButton.addEventListener('click', openThread);
-        submitButton.appendChild(submitText);
-        threadInput['submit'] = submitButton;
-
-        var form = createForm([usernameInput, commentInput, submitButton]);
-        commentbox.appendChild(form);
+        return wrapper;
     };
 
     /*
-     * Initialize commentbox.
+     * Group several nodes inside a new element with given tagName and
+     * attributes.
      */
-    var init = function () {
-        showThreadForm();
-        requestThreads();
+    var group = function(nodes, tagName, attributes) {
+        var group = make(tagName, attributes);
+        for (var i = 0; i < nodes.length; i++) {
+            group.appendChild(nodes[i]);
+        }
+
+        return group;
+    };
+
+    function ReplyForm(context) {
+        this.context = context;  // Thread
+
+        this.nameInput = null;
+        this.replyInput = null;
+        this.render = null;
+    }
+
+    ReplyForm.prototype = {
+        unmount: function() {
+            // replace this form with reply link
+            this.context.view().replaceChild(
+                this.context.replyLink,
+                this.render
+            );
+        },
+
+        cancelListener: function(self) {
+            return function(evt) {
+                evt.preventDefault();
+                self.unmount();
+            };
+        },
+
+        submitListener: function(self) {
+            return function(evt) {
+                evt.preventDefault();
+
+                ajax({
+                    method: 'POST',
+                    url: baseUrl + '/api/thread/' +
+                        self.context.thread.id + '/comment',
+                    success: function(data) {
+                        self.unmount();
+                    },
+                    data: {
+                        username: self.nameInput.value,
+                        text: self.replyInput.value
+                    }
+                });
+            };
+        },
+
+        init: function() {
+            this.nameInput = make('input', {
+                type: 'text',
+                placeholder: 'Name'
+            });
+            this.replyInput = make('textarea', {
+                rows: 4,
+                placeholder: 'Write reply'
+            });
+
+            var name = wrap(this.nameInput, 'p');
+            var reply = wrap(this.replyInput, 'p');
+            var cancel = wrap(
+                make('a', {
+                    href: '#',
+                    onclick: this.cancelListener(this),
+                    text: 'Cancel'
+                }),
+                'p'
+            );
+            var submit = wrap(
+                make('a', {
+                    href: '#',
+                    onclick: this.submitListener(this),
+                    text: 'Post reply'
+                }),
+                'p'
+            );
+
+            this.render = group([name, reply, cancel, submit], 'div');
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
+        },
+
+        mount: function() {
+            // replace reply link with this form
+            this.context.view().replaceChild(
+                this.view(),
+                this.context.replyLink
+            );
+        }
+    };
+
+    function Reply(context, reply) {
+        this.context = context;  // ReplyList
+        this.reply = reply;
+        this.render = null;
+    }
+
+    Reply.prototype = {
+        init: function() {
+            var name = wrap(make('b', {text: this.reply.username}), 'p');
+            var text = make('p' , {text: this.reply.text});
+            this.render = group([name, text], 'li');
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
+        },
+
+        mount: function() {
+            this.context.view().appendChild(this.view());
+        }
+    };
+
+    function ReplyList(context, replies) {
+        this.context = context;  // Thread
+        this.replies = [];
+        this.render = null;
+
+        for (var i = 0; i < replies.length; i++) {
+            var reply = new Reply(this, replies[i]);
+            this.replies.push(reply);
+        }
+    }
+
+    ReplyList.prototype = {
+        init: function() {
+            this.render = make('ul');
+            for (var i = 0; i < this.replies.length; i++) {
+                this.replies[i].mount();
+            }
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
+        },
+
+        mount: function() {
+            this.context.view().appendChild(this.view());
+        },
+
+        unmount: function() {
+            this.context.view().removeChild(this.view());
+        }
+    };
+
+    function Thread(context, thread) {
+        this.context = context;  // ThreadList
+        this.thread = thread;
+
+        this.render = null;
+        this.viewReplyLink = null;
+        this.replyLink = null;
+        this.replyList = null;
+
+        this.repliesLoaded = false;
+    }
+
+    Thread.prototype = {
+        chooseWord: function() {
+            if (this.thread.repliesCount === 0 ||
+                this.thread.repliesCount === null) {
+                return '';
+            } else if (this.thread.repliesCount === 1) {
+                return 'View reply';
+            }
+            return 'View ' + this.thread.repliesCount + ' replies';
+        },
+
+        hideReplies: function() {
+            this.replyList.unmount();
+            this.viewReplyLink.firstChild.nodeValue = this.chooseWord();
+            this.repliesLoaded = false;
+        },
+
+        showReplies: function(context) {
+            return function(replies) {
+                context.replyList = new ReplyList(context, replies);
+                context.replyList.mount();
+                context.viewReplyLink.firstChild.nodeValue = 'Hide replies';
+                context.repliesLoaded = true;
+            };
+        },
+
+        viewReplyListener: function(self) {
+            return function(evt) {
+                evt.preventDefault();
+
+                if (self.repliesLoaded) {
+                    self.hideReplies();
+                } else {
+                    ajax({
+                        method: 'GET',
+                        url: baseUrl + '/api/thread/' +
+                            self.thread.id + '/comments',
+                        success: self.showReplies(self),
+                        parse: true
+                    });
+                }
+            };
+        },
+
+        replyListener: function(self) {
+            return function(evt) {
+                evt.preventDefault();
+
+                self.replyForm = new ReplyForm(self);
+                self.replyForm.mount();
+            };
+        },
+
+        init: function() {
+            this.viewReplyLink = make('a', {
+                class: 'jombelajarjava-view-reply-link',
+                href: '#',
+                onclick: this.viewReplyListener(this),
+                text: this.chooseWord()
+            });
+
+            this.replyLink = wrap(
+                make('a', {
+                    href: '#',
+                    onclick: this.replyListener(this),
+                    text: 'Reply'
+                }),
+                'p'
+            );
+
+            var name = wrap(make('b', {text: this.thread.username}), 'p');
+            var text = make('p' , {text: this.thread.text});
+            var viewReply = wrap(this.viewReplyLink, 'p');
+
+            var elements = [name, text, viewReply, this.replyLink];
+
+            this.render = group(elements, 'li');
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
+        },
+
+        mount: function() {
+            this.context.view().appendChild(this.view());
+        }
+    };
+
+    function ThreadList(context, threads) {
+        context['threadList'] = this;
+
+        this.context = context;
+        this.threads = [];
+        this.render = null;
+
+        for (var i = 0; i < threads.length; i++) {
+            var thread = new Thread(this, threads[i]);
+            this.threads.push(thread);
+        }
+    }
+
+    ThreadList.prototype = {
+        prepend: function(data) {
+            var thread = new Thread(this, data);
+            this.threads.unshift(data);
+            this.render.insertBefore(thread.view(), this.render.firstChild);
+        },
+
+        init: function() {
+            this.render = make('ul');
+            for (var i = 0; i < this.threads.length; i++) {
+                this.threads[i].mount();
+            }
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
+        },
+
+        mount: function() {
+            this.context.root.appendChild(this.view());
+        }
+    };
+
+    function ThreadForm(context) {
+        context['threadForm'] = this;
+
+        this.context = context;
+        this.usernameInput = null;
+        this.commentInput = null;
+        this.submitButton = null;
+        this.render = null;
+    }
+
+    ThreadForm.prototype = {
+        showNewThread: function(context) {
+            return function(thread) {
+                context.context.threadList.prepend(thread);
+                context.commentInput.value = '';
+            };
+        },
+
+        openThread: function(self) {
+            return function(evt) {
+                evt.preventDefault();
+
+                ajax({
+                    method: 'POST',
+                    url: baseUrl + '/api/thread',
+                    success: self.showNewThread(self),
+                    parse: true,
+                    data: {
+                        username: self.usernameInput.value,
+                        text: self.commentInput.value
+                    }
+                });
+            };
+        },
+
+        init: function() {
+            this.usernameInput = make( 'input', {
+                type: 'text',
+                placeholder: 'Name'
+            });
+
+            this.commentInput = make('textarea', {
+                rows: 4,
+                placeholder: 'Write comment'
+            });
+
+            this.submitButton = make('a', {
+                href: '#',
+                onclick: this.openThread(this),
+                text: 'Post comment'
+            });
+
+            var username = wrap(this.usernameInput, 'p');
+            var comment = wrap(this.commentInput, 'p');
+            var submit = wrap(this.submitButton, 'p');
+
+            this.render = group([username, comment, submit], 'div');
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
+        },
+
+        mount: function () {
+            this.context.root.appendChild(this.view());
+        }
+    };
+
+    var init = function() {
+        var threadForm = new ThreadForm(context);
+        threadForm.mount();
+
+        ajax({
+            method: 'GET',
+            url: baseUrl + '/api/threads/latest',
+            parse: true,
+            success: function(threads) {
+                var threadList = new ThreadList(context, threads);
+                threadList.mount();
+            }
+        });
     };
 
     init();
