@@ -332,7 +332,7 @@
         prepend: function(data) {
             var thread = new Thread(this, data);
             this.threads.unshift(data);
-            this.render.insertBefore(getView(thread), getView(this).firstChild);
+            getView(this).insertBefore(getView(thread), getView(this).firstChild);
         },
 
         init: function() {
