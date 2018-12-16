@@ -240,7 +240,9 @@
         self.repliesLoaded = false;
 
         self.chooseWord = function() {
-            if (self.repliesCount == 1) {
+            if (self.repliesCount === 0) {
+                return '';
+            } else if (self.repliesCount === 1) {
                 return 'View reply';
             }
             return 'View ' + self.repliesCount + ' replies';
@@ -284,7 +286,7 @@
         self.init = function() {
             self.viewReplyLink = make('a', {
                 class: 'jombelajarjava-view-reply-link',
-                href: self.repliesLink,
+                href: '#',
                 onclick: self.viewReplyListener,
                 text: self.chooseWord()
             });
@@ -302,11 +304,7 @@
             var text = make('p' , {text: self.text});
             var viewReply = wrap(self.viewReplyLink, 'p');
 
-            var elements = [name, text];
-            if (self.repliesCount > 0) {
-                elements.push(viewReply);
-            }
-            elements.push(self.replyLink);
+            var elements = [name, text, viewReply, self.replyLink];
 
             self.container = group(elements, 'li');
         };
