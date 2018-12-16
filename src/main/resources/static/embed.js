@@ -258,12 +258,12 @@
             this.repliesLoaded = false;
         },
 
-        showReplies: function(context) {
+        showReplies: function(self) {
             return function(replies) {
-                context.replyList = new ReplyList(context, replies);
-                context.replyList.mount();
-                context.viewReplyLink.firstChild.nodeValue = 'Hide replies';
-                context.repliesLoaded = true;
+                self.replyList = new ReplyList(self, replies);
+                self.replyList.mount();
+                self.viewReplyLink.firstChild.nodeValue = 'Hide replies';
+                self.repliesLoaded = true;
             };
         },
 
@@ -382,10 +382,10 @@
     }
 
     ThreadForm.prototype = {
-        showNewThread: function(context) {
+        showNewThread: function(self) {
             return function(thread) {
-                context.context.threadList.prepend(thread);
-                context.commentInput.value = '';
+                self.context.threadList.prepend(thread);
+                self.commentInput.value = '';
             };
         },
 
