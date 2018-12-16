@@ -172,13 +172,21 @@
     function Reply(context, reply) {
         this.context = context;  // ReplyList
         this.reply = reply;
+        this.render = null;
     }
 
     Reply.prototype = {
-        view: function() {
+        init: function() {
             var name = wrap(make('b', {text: this.reply.username}), 'p');
             var text = make('p' , {text: this.reply.text});
-            return group([name, text], 'li');
+            this.render = group([name, text], 'li');
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
         },
 
         mount: function() {
@@ -370,6 +378,7 @@
         this.usernameInput = null;
         this.commentInput = null;
         this.submitButton = null;
+        this.render = null;
     }
 
     ThreadForm.prototype = {
@@ -413,14 +422,19 @@
                 onclick: this.openThread(this),
                 text: 'Post comment'
             });
-        },
 
-        view: function() {
-            this.init();
             var username = wrap(this.usernameInput, 'p');
             var comment = wrap(this.commentInput, 'p');
             var submit = wrap(this.submitButton, 'p');
-            return group([username, comment, submit], 'div');
+
+            this.render = group([username, comment, submit], 'div');
+        },
+
+        view: function() {
+            if (this.render === null) {
+                this.init();
+            }
+            return this.render;
         },
 
         mount: function () {
