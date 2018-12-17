@@ -18,6 +18,12 @@ public class ApiController {
         return new Message(threads);
     }
 
+    @GetMapping("/api/threads")
+    public Message loadMoreThreads(@RequestParam String cursorAfter) {
+        List<Comment> threads = commentService.getThreads(cursorAfter);
+        return new Message(threads);
+    }
+
     @GetMapping("/api/thread/{threadId}/comments")
     public Message comments(@PathVariable Long threadId) {
         List<Comment> replies = commentService.getReplies(threadId);

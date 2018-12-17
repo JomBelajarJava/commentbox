@@ -1,5 +1,6 @@
 package com.jombelajarjava.commentbox.database.repositories;
 
+import com.google.cloud.datastore.Cursor;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
 import com.jombelajarjava.commentbox.database.entities.Comment;
@@ -16,6 +17,17 @@ public class CommentRepository {
         Query<Comment> query = ofy()
                 .load()
                 .type(Comment.class)
+                .order("-created")
+                .filter("threadKey", null);
+
+        return take(5, query);
+    }
+
+    public List<Comment> findThreads(Cursor cursor) {
+        Query<Comment> query = ofy()
+                .load()
+                .type(Comment.class)
+                .startAt(cursor)
                 .order("-created")
                 .filter("threadKey", null);
 
