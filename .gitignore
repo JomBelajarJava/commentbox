@@ -1,6 +1,8 @@
 /target/
 !.mvn/wrapper/maven-wrapper.jar
 /.mvn/
+/src/main/resources/static/embed.js
+/src/main/javascript/dist/
 
 ### STS ###
 .apt_generated

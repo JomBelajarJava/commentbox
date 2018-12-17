@@ -1,0 +1,6 @@
+screen keynav
+screen -t intellij sh -c "~/intellij/bin/idea.sh"
+screen -t datastore sh -c "gcloud beta emulators datastore start; exec bash"
+screen -t maven bash
+screen -t javascript sh -c "cd src/main/javascript; ./make; exec bash"
+screen bash
