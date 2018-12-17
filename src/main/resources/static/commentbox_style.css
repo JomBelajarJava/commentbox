@@ -1,0 +1,24 @@
+#jombelajarjava-commentbox {
+    padding: 1px 15px 15px 15px;
+}
+
+#jombelajarjava-commentbox textarea {
+    width: 100%;
+    resize: none;
+}
+#jombelajarjava-commentbox .form-buttons-container {
+    text-align: right;
+}
+#jombelajarjava-commentbox .form-buttons-container a {
+    margin-left: 10px;
+}
+
+#jombelajarjava-commentbox li {
+    list-style-type: none;
+}
+#jombelajarjava-commentbox .reply-button {
+    text-align: right;
+}
+#jombelajarjava-commentbox .view-reply-button {
+    text-align: center;
+}

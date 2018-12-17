@@ -133,30 +133,29 @@
                 placeholder: 'Name'
             });
             this.replyInput = make('textarea', {
-                rows: 4,
+                rows: 6,
                 placeholder: 'Write reply'
             });
 
             var name = wrap(this.nameInput, 'p');
             var reply = wrap(this.replyInput, 'p');
-            var cancel = wrap(
-                make('a', {
-                    href: '#',
-                    onclick: this.cancelListener(this),
-                    text: 'Cancel'
-                }),
-                'p'
-            );
-            var submit = wrap(
-                make('a', {
-                    href: '#',
-                    onclick: this.submitListener(this),
-                    text: 'Post reply'
-                }),
-                'p'
+
+            var cancel = make('a', {
+                href: '#',
+                onclick: this.cancelListener(this),
+                text: 'Cancel'
+            });
+            var submit = make('a', {
+                href: '#',
+                onclick: this.submitListener(this),
+                text: 'Post reply'
+            });
+            var buttons = group(
+                [cancel, submit],
+                'p', { class: 'form-buttons-container' }
             );
 
-            this.view = group([name, reply, cancel, submit], 'div');
+            this.view = group([name, reply, buttons], 'div');
         },
 
         mount: function() {
@@ -295,7 +294,6 @@
 
         render: function() {
             this.viewReplyLink = make('a', {
-                class: 'jombelajarjava-view-reply-link',
                 href: '#',
                 onclick: this.viewReplyListener(this),
                 text: this.chooseWord()
@@ -307,14 +305,17 @@
                     onclick: this.replyListener(this),
                     text: 'Reply'
                 }),
-                'p'
+                'p', { class: 'reply-button' }
             );
 
             var name = wrap(make('b', {text: this.thread.username}), 'p');
             var text = make('p' , {text: this.thread.text});
-            var viewReply = wrap(this.viewReplyLink, 'p');
+            var viewReply = wrap(
+                this.viewReplyLink,
+                'p', { class: 'view-reply-button' }
+            );
 
-            var elements = [name, text, viewReply, this.replyLink];
+            var elements = [name, text, this.replyLink, viewReply];
 
             this.view = group(elements, 'li');
         },
@@ -398,7 +399,7 @@
             });
 
             this.commentInput = make('textarea', {
-                rows: 4,
+                rows: 6,
                 placeholder: 'Write comment'
             });
 
@@ -410,7 +411,10 @@
 
             var username = wrap(this.usernameInput, 'p');
             var comment = wrap(this.commentInput, 'p');
-            var submit = wrap(this.submitButton, 'p');
+            var submit = wrap(
+                this.submitButton,
+                'p', { class: 'form-buttons-container' }
+            );
 
             this.view = group([username, comment, submit], 'div');
         },
