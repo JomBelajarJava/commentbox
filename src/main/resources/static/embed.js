@@ -341,11 +341,55 @@
         }
     };
 
+    function LoadMoreThread(context, cursorAfter) {
+        this.context = context;  // ThreadList
+        this.cursorAfter = cursorAfter;
+        this.view = null;
+    }
+
+    LoadMoreThread.prototype = {
+        loadMoreListener: function(self) {
+            return function(evt) {
+                evt.preventDefault();
+
+                ajax({
+                    method: 'GET',
+                    url: baseUrl + '/api/threads?cursorAfter=' + self.cursorAfter,
+                    parse: true,
+                    success: function(moreThreads) {
+                        self.context.loadMoreThreads(moreThreads);
+                    }
+                });
+            };
+        },
+
+        render: function() {
+            this.view = wrap(
+                make('a', {
+                    href: '#',
+                    onclick: this.loadMoreListener(this),
+                    text: 'Load more comments'
+                }),
+                'li', { class: 'load-more' }
+            );
+        },
+
+        mount: function() {
+            getView(this.context).appendChild(getView(this));
+        },
+
+        unmount: function() {
+            getView(this.context).removeChild(getView(this));
+            this.context.loadMore = null;
+        }
+    };
+
     function ThreadList(context, threads) {
         context.threadList = this;
 
         this.context = context;
         this.threads = [];
+        this.loadMore = null;
         this.view = null;
 
         for (var i = 0; i < threads.length; i++) {
@@ -361,11 +405,34 @@
             getView(this).insertBefore(getView(thread), getView(this).firstChild);
         },
 
+        renderLoadMore: function() {
+            var lastThread = this.threads[this.threads.length - 1];
+            var cursorAfter = lastThread.thread.cursorAfter;
+            if (cursorAfter !== null) {
+                this.loadMore = new LoadMoreThread(this, cursorAfter);
+                this.loadMore.mount();
+            }
+        },
+
+        loadMoreThreads: function(moreThreads) {
+            this.loadMore.unmount();
+
+            for (var i = 0; i < moreThreads.length; i++) {
+                var thread = new Thread(this, moreThreads[i]);
+                this.threads.push(thread);
+                thread.mount();
+            }
+
+            this.renderLoadMore();
+        },
+
         render: function() {
             this.view = make('ul', { class: 'thread-list' });
             for (var i = 0; i < this.threads.length; i++) {
                 this.threads[i].mount();
             }
+
+            this.renderLoadMore();
         },
 
         mount: function() {
