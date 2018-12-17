@@ -288,7 +288,7 @@
                     ajax({
                         method: 'GET',
                         url: baseUrl + '/api/thread/' +
-                            self.thread.id + '/comments',
+                            self.thread.id + '/comments/earliest',
                         success: self.showReplies(self),
                         parse: true
                     });

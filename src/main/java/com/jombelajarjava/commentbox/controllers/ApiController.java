@@ -24,9 +24,15 @@ public class ApiController {
         return new Message(threads);
     }
 
+    @GetMapping("/api/thread/{threadId}/comments/earliest")
+    public Message replies(@PathVariable Long threadId) {
+        List<Comment> replies = commentService.getEarliestReplies(threadId);
+        return new Message(replies);
+    }
+
     @GetMapping("/api/thread/{threadId}/comments")
-    public Message comments(@PathVariable Long threadId) {
-        List<Comment> replies = commentService.getReplies(threadId);
+    public Message moreReplies(@PathVariable Long threadId, @RequestParam String cursorAfter) {
+        List<Comment> replies = commentService.getReplies(threadId, cursorAfter);
         return new Message(replies);
     }
 

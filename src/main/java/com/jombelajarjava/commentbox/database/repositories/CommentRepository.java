@@ -43,10 +43,21 @@ public class CommentRepository {
                 .now();
     }
 
-    public List<Comment> findReplies(Long threadId) {
+    public List<Comment> findEarliestReplies(Long threadId) {
         Query<Comment> query = ofy()
                 .load()
                 .type(Comment.class)
+                .order("created")
+                .filter("threadKey", Key.create(Comment.class, threadId));
+
+        return take(10, query);
+    }
+
+    public List<Comment> findReplies(Long threadId, Cursor cursor) {
+        Query<Comment> query = ofy()
+                .load()
+                .type(Comment.class)
+                .startAt(cursor)
                 .order("created")
                 .filter("threadKey", Key.create(Comment.class, threadId));
 

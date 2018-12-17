@@ -28,8 +28,13 @@ public class CommentService {
         return associateRepliesCount(threads);
     }
 
-    public List<Comment> getReplies(Long threadId) {
-        return commentRepository.findReplies(threadId);
+    public List<Comment> getEarliestReplies(Long threadId) {
+        return commentRepository.findEarliestReplies(threadId);
+    }
+
+    public List<Comment> getReplies(Long threadId, String cursorAfter) {
+        Cursor cursor = Cursor.fromUrlSafe(cursorAfter);
+        return commentRepository.findReplies(threadId, cursor);
     }
 
     public Comment addThread(Comment comment) {
