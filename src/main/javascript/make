@@ -1,0 +1,20 @@
+#!/bin/sh
+
+TEMP_FILE=temp
+OUTPUT_FILE=embed.js
+OUTPUT_DIR=./dist
+STATIC_DIR=../resources/static
+
+rm -rf $OUTPUT_DIR
+mkdir $OUTPUT_DIR
+
+echo '' > $OUTPUT_DIR/$TEMP_FILE
+find ./components -name \*.js -exec cat {} >> $OUTPUT_DIR/$TEMP_FILE \;
+
+echo '' > $OUTPUT_DIR/$OUTPUT_FILE
+echo '(function(){' >> $OUTPUT_DIR/$OUTPUT_FILE
+cat utils.js $OUTPUT_DIR/$TEMP_FILE index.js >> $OUTPUT_DIR/$OUTPUT_FILE
+echo '})();' >> $OUTPUT_DIR/$OUTPUT_FILE
+
+rm $OUTPUT_DIR/$TEMP_FILE
+mv $OUTPUT_DIR/$OUTPUT_FILE $STATIC_DIR
