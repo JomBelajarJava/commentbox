@@ -7,16 +7,6 @@
         view: document.getElementById('jombelajarjava-commentbox')
     };
 
-    // TODO: remove this
-    var persistReply = function (container, name, reply) {
-        var comment = createComment({username: name, text: reply});
-        var ul = document.createElement('ul');
-        ul.appendChild(comment);
-
-        container.parentElement.replaceChild(ul, container);
-    };
-
-
     /*
      * Get view rendered by the component.
      */
@@ -117,6 +107,11 @@
                     url: baseUrl + '/api/thread/' +
                         self.context.thread.id + '/comment',
                     success: function(data) {
+                        self.context.addReply({
+                            username: self.nameInput.value,
+                            text: self.replyInput.value,
+                            isRecent: true
+                        });
                         self.unmount();
                     },
                     data: {
@@ -187,7 +182,12 @@
         render: function() {
             var name = wrap(make('b', {text: this.reply.username}), 'p');
             var text = make('p' , {text: this.reply.text});
-            this.view = group([name, text], 'li');
+
+            if (this.reply.isRecent) {
+                this.view = group([name, text], 'li', { class: 'recent-reply' });
+            } else {
+                this.view = group([name, text], 'li');
+            }
         },
 
         mount: function() {
@@ -207,6 +207,12 @@
     }
 
     ReplyList.prototype = {
+        prepend: function(data) {
+            var reply = new Reply(this, data);
+            this.replies.unshift(data);
+            getView(this).insertBefore(getView(reply), getView(this).firstChild);
+        },
+
         render: function() {
             this.view = make('ul');
             for (var i = 0; i < this.replies.length; i++) {
@@ -245,6 +251,16 @@
                 return 'View reply';
             }
             return 'View ' + this.thread.repliesCount + ' replies';
+        },
+
+        addReply: function(data) {
+            this.thread.repliesCount++;
+
+            if (this.replyList === null) {
+                this.viewReplyLink.firstChild.nodeValue = this.chooseWord();
+            } else {
+                this.replyList.prepend(data);
+            }
         },
 
         hideReplies: function() {
@@ -346,7 +362,7 @@
         },
 
         render: function() {
-            this.view = make('ul');
+            this.view = make('ul', { class: 'thread-list' });
             for (var i = 0; i < this.threads.length; i++) {
                 this.threads[i].mount();
             }

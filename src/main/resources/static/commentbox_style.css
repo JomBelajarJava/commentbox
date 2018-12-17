@@ -13,12 +13,22 @@
     margin-left: 10px;
 }
 
+#jombelajarjava-commentbox .thread-list {
+    padding: 0;
+    margin: 0;
+}
+
 #jombelajarjava-commentbox li {
     list-style-type: none;
+    padding: 1px 16px;
 }
 #jombelajarjava-commentbox .reply-button {
     text-align: right;
 }
 #jombelajarjava-commentbox .view-reply-button {
     text-align: center;
+}
+
+#jombelajarjava-commentbox .recent-reply {
+    background-color: lightgreen;
 }
