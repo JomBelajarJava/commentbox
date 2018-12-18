@@ -16,7 +16,7 @@ ReplyList.prototype = {
 
     renderLoadMore: function() {
         var lastReply = this.replies[this.replies.length - 1];
-        var cursorAfter = lastReply.reply.cursorAfter;
+        var cursorAfter = lastReply.props.cursorAfter;
         if (cursorAfter !== null) {
             this.loadMore = new LoadMoreReplies(this, cursorAfter);
             this.loadMore.mount();

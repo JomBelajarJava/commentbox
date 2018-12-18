@@ -35,9 +35,9 @@ Thread.prototype = {
             evt.preventDefault();
 
             if (self.repliesLoaded) {
-                this.replyList.unmount();
-                this.viewReplyLink.firstChild.nodeValue = this.chooseWord();
-                this.repliesLoaded = false;
+                self.replyList.unmount();
+                self.viewReplyLink.firstChild.nodeValue = self.chooseWord();
+                self.repliesLoaded = false;
             } else {
                 var showReplies = function(replies) {
                     self.replyList = new ReplyList(self, replies);
@@ -98,6 +98,6 @@ Thread.prototype = {
     },
 
     mount: function() {
-        getView(this.context).appendChild(getView(this));
+        getView(this.threadList).appendChild(getView(this));
     }
 };

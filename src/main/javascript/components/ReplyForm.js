@@ -23,7 +23,7 @@ ReplyForm.prototype = {
             };
 
             var showSubmittedReply = function(data) {
-                self.context.addReply({
+                self.thread.addReply({
                     username: self.nameInput.value,
                     text: self.replyInput.value,
                     isRecent: true
