@@ -36,7 +36,7 @@ public class ApiController {
         return new Message(replies);
     }
 
-    @PostMapping(value = "/api/thread")
+    @PostMapping("/api/thread")
     public Message openThread(@ModelAttribute Comment comment) {
         Comment thread = commentService.addThread(comment);
         return new Message(thread);
