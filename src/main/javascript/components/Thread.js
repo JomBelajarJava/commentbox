@@ -10,21 +10,23 @@ function Thread(threadList, thread) {
 }
 
 Thread.prototype = {
-    chooseWord: function() {
+    renderRepliesCount: function() {
+        var textNode = this.viewReplyLink.firstChild;
+
         if (this.props.repliesCount === 0) {
-            return '';
+            textNode.nodeValue = '';
         } else if (this.props.repliesCount === 1) {
-            return 'View reply';
+            textNode.nodeValue =  'View reply';
+        } else {
+            textNode.nodeValue = 'View ' + this.props.repliesCount + ' replies';
         }
-        return 'View ' + this.props.repliesCount + ' replies';
     },
 
     addReply: function(reply) {
         this.props.repliesCount++;
 
-        if (this.replyList === null) {  // If replyList is not shown
-            // Update the text that shows replies count
-            this.viewReplyLink.firstChild.nodeValue = this.chooseWord();
+        if (this.replyList === null) {  // if replyList is not shown
+            this.renderRepliesCount();
         } else {
             this.replyList.prepend(reply);
         }
@@ -36,7 +38,7 @@ Thread.prototype = {
 
             if (self.repliesLoaded) {
                 self.replyList.unmount();
-                self.viewReplyLink.firstChild.nodeValue = self.chooseWord();
+                self.renderRepliesCount();
                 self.repliesLoaded = false;
             } else {
                 var showReplies = function(replies) {
@@ -73,8 +75,9 @@ Thread.prototype = {
         this.viewReplyLink = make('a', {
             href: '#',
             onclick: this.viewReplyListener(this),
-            text: this.chooseWord()
+            text: ''  // append textnode, required for renderRepliesCount()
         });
+        this.renderRepliesCount();
 
         this.replyLink = wrap(
             make('a', {
