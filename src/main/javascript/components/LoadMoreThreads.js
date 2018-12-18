@@ -1,10 +1,10 @@
-function LoadMoreThread(threadList, cursorAfter) {
+function LoadMoreThreads(threadList, cursorAfter) {
     this.threadList = threadList;  // context
     this.cursorAfter = cursorAfter;
     this.view = null;
 }
 
-LoadMoreThread.prototype = {
+LoadMoreThreads.prototype = {
     loadMoreListener: function(self) {
         return function(evt) {
             evt.preventDefault();
