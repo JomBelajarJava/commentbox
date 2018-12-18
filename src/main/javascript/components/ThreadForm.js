@@ -14,53 +14,49 @@ ThreadForm.prototype = {
             evt.preventDefault();
 
             var data = {
-                username: self.usernameInput.value,
-                text: self.commentInput.value
+                username: self.usernameInput.val(),
+                text: self.commentInput.val()
             };
 
-            var showNewThread = function(thread) {
-                self.context.threadList.prepend(thread);
-                self.commentInput.value = '';
+            var showNewThread = function(response) {
+                self.context.threadList.prepend(response.data);
+                self.commentInput.val('');
             };
 
-            ajax({
+            $.ajax({
                 method: 'POST',
                 url: baseUrl + '/api/thread',
-                parse: true,
                 data: data,
+                dataType: 'jsonp',
                 success: showNewThread
             });
         };
     },
 
     render: function() {
-        this.usernameInput = make( 'input', {
-            type: 'text',
-            placeholder: 'Name'
-        });
+        this.usernameInput = $('<input>')
+            .attr('type', 'text')
+            .attr('placeholder', 'Name');
 
-        this.commentInput = make('textarea', {
-            rows: 6,
-            placeholder: 'Write comment'
-        });
+        this.commentInput = $('<textarea/>')
+            .attr('rows', 6)
+            .attr('placeholder', 'Write comment');
 
-        this.submitButton = make('a', {
-            href: '#',
-            onclick: this.submit(this),
-            text: 'Post comment'
-        });
+        this.submitButton = $('<a/>')
+            .attr('href', '#')
+            .click(this.submit(this))
+            .text('Post comment');
 
-        var username = wrap(this.usernameInput, 'p');
-        var comment = wrap(this.commentInput, 'p');
-        var submit = wrap(
-            this.submitButton,
-            'p', { class: 'form-buttons-container' }
-        );
+        var username = $('<p/>').append(this.usernameInput);
+        var comment = $('<p/>').append(this.commentInput);
+        var submit = $('<p/>')
+            .addClass('form-buttons-container')
+            .append(this.submitButton);
 
-        this.view = group([username, comment, submit], 'div');
+        this.view = $('<div/>').append(username, comment, submit);
     },
 
     mount: function () {
-        getView(this.context).appendChild(getView(this));
+        getView(this.context).append(getView(this));
     }
 };

@@ -6,17 +6,20 @@ function Reply(replyList, reply) {
 
 Reply.prototype = {
     render: function() {
-        var name = wrap(make('b', { text: this.props.username }), 'p');
-        var text = make('p' , { text: this.props.text });
+        var boldName = $('<b/>').text(this.props.username);
+        var name = $('<p/>').append(boldName);
+        var text = $('<p/>').text(this.props.text);
 
         if (this.props.isRecent) {
-            this.view = group([name, text], 'li', { class: 'recent-reply' });
+            this.view = $('<li/>')
+                .addClass('recent-reply')
+                .append(name, text);
         } else {
-            this.view = group([name, text], 'li');
+            this.view = $('<li/>').append(name, text);
         }
     },
 
     mount: function() {
-        getView(this.replyList).appendChild(getView(this));
+        getView(this.replyList).append(getView(this));
     }
 };

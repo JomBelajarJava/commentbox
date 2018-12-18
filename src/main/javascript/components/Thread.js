@@ -11,14 +11,13 @@ function Thread(threadList, thread) {
 
 Thread.prototype = {
     renderRepliesCount: function() {
-        var textNode = this.viewReplyLink.firstChild;
-
         if (this.props.repliesCount === 0) {
-            textNode.nodeValue = '';
+            this.viewReplyLink.text('');
         } else if (this.props.repliesCount === 1) {
-            textNode.nodeValue =  'View reply';
+            this.viewReplyLink.text('View reply');
         } else {
-            textNode.nodeValue = 'View ' + this.props.repliesCount + ' replies';
+            this.viewReplyLink
+                .text('View ' + this.props.repliesCount + ' replies');
         }
     },
 
@@ -41,18 +40,19 @@ Thread.prototype = {
                 self.renderRepliesCount();
                 self.repliesLoaded = false;
             } else {
-                var showReplies = function(replies) {
+                var showReplies = function(response) {
+                    var replies = response.data;
+
                     self.replyList = new ReplyList(self, replies);
                     self.replyList.mount();
-                    self.viewReplyLink.firstChild.nodeValue = 'Hide replies';
+                    self.viewReplyLink.text('Hide replies');
                     self.repliesLoaded = true;
                 };
 
-                ajax({
-                    method: 'GET',
-                    url: baseUrl + '/api/thread/' +
-                        self.props.id + '/comments/earliest',
-                    parse: true,
+                $.ajax({
+                    url: baseUrl + '/api/thread/' + self.props.id +
+                        '/comments/earliest',
+                    dataType: 'jsonp',
                     success: showReplies
                 });
             }
@@ -72,35 +72,34 @@ Thread.prototype = {
     },
 
     render: function() {
-        this.viewReplyLink = make('a', {
-            href: '#',
-            onclick: this.viewReplyListener(this),
-            text: ''  // append textnode, required for renderRepliesCount()
-        });
+        this.viewReplyLink = $('<a/>')
+            .attr('href', '#')
+            .click(this.viewReplyListener(this));
         this.renderRepliesCount();
 
-        this.replyLink = wrap(
-            make('a', {
-                href: '#',
-                onclick: this.replyListener(this),
-                text: 'Reply'
-            }),
-            'p', { class: 'reply-button' }
-        );
+        var replyAnchor = $('<a/>')
+            .attr('href', '#')
+            .click(this.replyListener(this))
+            .text('Reply');
+        this.replyLink = $('<p/>')
+            .addClass('reply-button')
+            .append(replyAnchor);
 
-        var name = wrap(make('b', { text: this.props.username }), 'p');
-        var text = make('p' , { text: this.props.text });
-        var viewReply = wrap(
-            this.viewReplyLink,
-            'p', { class: 'view-reply-button' }
-        );
+        var name = $('<p/>')
+            .append(
+                $('<b/>').text(this.props.username)
+            );
 
-        var elements = [name, text, this.replyLink, viewReply];
+        var text = $('<p/>').text(this.props.text);
 
-        this.view = group(elements, 'li');
+        var viewReply = $('<p/>')
+            .addClass('view-reply-button')
+            .append(this.viewReplyLink);
+
+        this.view = $('<li/>').append(name, text, this.replyLink, viewReply);
     },
 
     mount: function() {
-        getView(this.threadList).appendChild(getView(this));
+        getView(this.threadList).append(getView(this));
     }
 };

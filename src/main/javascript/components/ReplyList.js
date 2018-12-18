@@ -11,7 +11,7 @@ ReplyList.prototype = {
         this.props.unshift(data);
 
         var reply = new Reply(this, data);
-        getView(this).insertBefore(getView(reply), getView(this).firstChild);
+        getView(this).prepend(getView(reply));
     },
 
     renderLoadMore: function() {
@@ -40,17 +40,17 @@ ReplyList.prototype = {
     },
 
     render: function() {
-        this.view = make('ul');
+        this.view = $('<ul/>');
         this.renderReplies(this.props);
         this.renderLoadMore();
     },
 
     mount: function() {
-        getView(this.thread).appendChild(getView(this));
+        getView(this.thread).append(getView(this));
     },
 
     unmount: function() {
-        getView(this.thread).removeChild(getView(this));
+        getView(this).remove();
         this.thread.replyList = null;
     }
 };

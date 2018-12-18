@@ -3,7 +3,7 @@ var context = {
     threadForm: null,
     threadList: null,
     replyForm: null,
-    view: document.getElementById('jombelajarjava-commentbox')
+    view: $('div#jombelajarjava-commentbox')
 };
 
 /*
@@ -13,12 +13,11 @@ var init = function() {
     var threadForm = new ThreadForm(context);
     threadForm.mount();
 
-    ajax({
-        method: 'GET',
+    $.ajax({
         url: baseUrl + '/api/threads/latest',
-        parse: true,
-        success: function(threads) {
-            var threadList = new ThreadList(context, threads);
+        dataType: 'jsonp',
+        success: function(response) {
+            var threadList = new ThreadList(context, response.data);
             threadList.mount();
         }
     });
