@@ -15,11 +15,13 @@ ReplyList.prototype = {
     },
 
     renderLoadMore: function() {
-        var lastReply = this.replies[this.replies.length - 1];
-        var cursorAfter = lastReply.props.cursorAfter;
-        if (cursorAfter !== null) {
-            this.loadMore = new LoadMoreReplies(this, cursorAfter);
-            this.loadMore.mount();
+        if (this.replies.length > 0) {
+            var lastReply = this.replies[this.replies.length - 1];
+            var cursorAfter = lastReply.props.cursorAfter;
+            if (cursorAfter !== null) {
+                this.loadMore = new LoadMoreReplies(this, cursorAfter);
+                this.loadMore.mount();
+            }
         }
     },
 

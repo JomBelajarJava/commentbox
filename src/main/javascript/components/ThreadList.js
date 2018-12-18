@@ -17,11 +17,13 @@ ThreadList.prototype = {
     },
 
     renderLoadMore: function() {
-        var lastThread = this.threads[this.threads.length - 1];
-        var cursorAfter = lastThread.props.cursorAfter;
-        if (cursorAfter !== null) {
-            this.loadMore = new LoadMoreThreads(this, cursorAfter);
-            this.loadMore.mount();
+        if (this.threads.length > 0) {
+            var lastThread = this.threads[this.threads.length - 1];
+            var cursorAfter = lastThread.props.cursorAfter;
+            if (cursorAfter !== null) {
+                this.loadMore = new LoadMoreThreads(this, cursorAfter);
+                this.loadMore.mount();
+            }
         }
     },
 
