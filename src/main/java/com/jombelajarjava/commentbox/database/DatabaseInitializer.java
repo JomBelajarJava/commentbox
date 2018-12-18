@@ -15,7 +15,7 @@ public class DatabaseInitializer implements ServletContextListener {
         ObjectifyService.init(new ObjectifyFactory(
                 DatastoreOptions.newBuilder()
                         .setHost("http://localhost:8081")
-                        .setProjectId("hello-225223")
+                        .setProjectId("vivid-reality-225905")
                         .build()
                         .getService()
         ));
