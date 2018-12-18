@@ -30,7 +30,7 @@ public class Comment {
     private Key<Comment> threadKey;
 
     @Ignore
-    private Integer repliesCount;
+    private Integer repliesCount = 0;
 
     @Ignore
     private String cursorAfter;

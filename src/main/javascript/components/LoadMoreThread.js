@@ -1,5 +1,5 @@
-function LoadMoreThread(context, cursorAfter) {
-    this.context = context;  // ThreadList
+function LoadMoreThread(threadList, cursorAfter) {
+    this.threadList = threadList;  // context
     this.cursorAfter = cursorAfter;
     this.view = null;
 }
@@ -13,8 +13,8 @@ LoadMoreThread.prototype = {
                 method: 'GET',
                 url: baseUrl + '/api/threads?cursorAfter=' + self.cursorAfter,
                 parse: true,
-                success: function(moreThreads) {
-                    self.context.loadMoreThreads(moreThreads);
+                success: function(threads) {
+                    self.threadList.loadMoreThreads(threads);
                 }
             });
         };
@@ -32,11 +32,11 @@ LoadMoreThread.prototype = {
     },
 
     mount: function() {
-        getView(this.context).appendChild(getView(this));
+        getView(this.threadList).appendChild(getView(this));
     },
 
     unmount: function() {
-        getView(this.context).removeChild(getView(this));
-        this.context.loadMore = null;
+        getView(this.threadList).removeChild(getView(this));
+        this.threadList.loadMore = null;
     }
 };

@@ -1,7 +1,6 @@
-function Thread(context, thread) {
-    this.context = context;  // ThreadList
-    this.thread = thread;
-
+function Thread(threadList, thread) {
+    this.threadList = threadList;  // context
+    this.props = thread;
     this.view = null;
     this.viewReplyLink = null;
     this.replyLink = null;
@@ -12,38 +11,23 @@ function Thread(context, thread) {
 
 Thread.prototype = {
     chooseWord: function() {
-        if (this.thread.repliesCount === 0 ||
-            this.thread.repliesCount === null) {
+        if (this.props.repliesCount === 0) {
             return '';
-        } else if (this.thread.repliesCount === 1) {
+        } else if (this.props.repliesCount === 1) {
             return 'View reply';
         }
-        return 'View ' + this.thread.repliesCount + ' replies';
+        return 'View ' + this.props.repliesCount + ' replies';
     },
 
-    addReply: function(data) {
-        this.thread.repliesCount++;
+    addReply: function(reply) {
+        this.props.repliesCount++;
 
-        if (this.replyList === null) {
+        if (this.replyList === null) {  // If replyList is not shown
+            // Update the text that shows replies count
             this.viewReplyLink.firstChild.nodeValue = this.chooseWord();
         } else {
-            this.replyList.prepend(data);
+            this.replyList.prepend(reply);
         }
-    },
-
-    hideReplies: function() {
-        this.replyList.unmount();
-        this.viewReplyLink.firstChild.nodeValue = this.chooseWord();
-        this.repliesLoaded = false;
-    },
-
-    showReplies: function(self) {
-        return function(replies) {
-            self.replyList = new ReplyList(self, replies);
-            self.replyList.mount();
-            self.viewReplyLink.firstChild.nodeValue = 'Hide replies';
-            self.repliesLoaded = true;
-        };
     },
 
     viewReplyListener: function(self) {
@@ -51,14 +35,23 @@ Thread.prototype = {
             evt.preventDefault();
 
             if (self.repliesLoaded) {
-                self.hideReplies();
+                this.replyList.unmount();
+                this.viewReplyLink.firstChild.nodeValue = this.chooseWord();
+                this.repliesLoaded = false;
             } else {
+                var showReplies = function(replies) {
+                    self.replyList = new ReplyList(self, replies);
+                    self.replyList.mount();
+                    self.viewReplyLink.firstChild.nodeValue = 'Hide replies';
+                    self.repliesLoaded = true;
+                };
+
                 ajax({
                     method: 'GET',
                     url: baseUrl + '/api/thread/' +
-                        self.thread.id + '/comments/earliest',
-                    success: self.showReplies(self),
-                    parse: true
+                        self.props.id + '/comments/earliest',
+                    parse: true,
+                    success: showReplies
                 });
             }
         };
@@ -92,8 +85,8 @@ Thread.prototype = {
             'p', { class: 'reply-button' }
         );
 
-        var name = wrap(make('b', {text: this.thread.username}), 'p');
-        var text = make('p' , {text: this.thread.text});
+        var name = wrap(make('b', { text: this.props.username }), 'p');
+        var text = make('p' , { text: this.props.text });
         var viewReply = wrap(
             this.viewReplyLink,
             'p', { class: 'view-reply-button' }

@@ -2,50 +2,48 @@ function ThreadList(context, threads) {
     context.threadList = this;
 
     this.context = context;
-    this.threads = [];
-    this.loadMore = null;
+    this.props = threads;
     this.view = null;
-
-    for (var i = 0; i < threads.length; i++) {
-        var thread = new Thread(this, threads[i]);
-        this.threads.push(thread);
-    }
+    this.loadMore = null;
+    this.threads = [];
 }
 
 ThreadList.prototype = {
     prepend: function(data) {
+        this.props.unshift(data);
+
         var thread = new Thread(this, data);
-        this.threads.unshift(data);
         getView(this).insertBefore(getView(thread), getView(this).firstChild);
     },
 
     renderLoadMore: function() {
         var lastThread = this.threads[this.threads.length - 1];
-        var cursorAfter = lastThread.thread.cursorAfter;
+        var cursorAfter = lastThread.props.cursorAfter;
         if (cursorAfter !== null) {
             this.loadMore = new LoadMoreThread(this, cursorAfter);
             this.loadMore.mount();
         }
     },
 
-    loadMoreThreads: function(moreThreads) {
+    loadMoreThreads: function(threads) {
+        this.props.concat(threads);
+
         this.loadMore.unmount();
-
-        for (var i = 0; i < moreThreads.length; i++) {
-            var thread = new Thread(this, moreThreads[i]);
-            this.threads.push(thread);
-            thread.mount();
-        }
-
+        this.renderThreads(threads);
         this.renderLoadMore();
+    },
+
+    renderThreads: function(threads) {
+        for (var i = 0; i < threads.length; i++) {
+            var thread = new Thread(this, threads[i]);
+            thread.mount();
+            this.threads.push(thread);
+        }
     },
 
     render: function() {
         this.view = make('ul', { class: 'thread-list' });
-        for (var i = 0; i < this.threads.length; i++) {
-            this.threads[i].mount();
-        }
-
+        this.renderThreads(this.props);
         this.renderLoadMore();
     },
 

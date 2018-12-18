@@ -1,15 +1,15 @@
-function Reply(context, reply) {
-    this.context = context;  // ReplyList
-    this.reply = reply;
+function Reply(replyList, reply) {
+    this.replyList = replyList;  // context
+    this.props = reply;
     this.view = null;
 }
 
 Reply.prototype = {
     render: function() {
-        var name = wrap(make('b', {text: this.reply.username}), 'p');
-        var text = make('p' , {text: this.reply.text});
+        var name = wrap(make('b', { text: this.props.username }), 'p');
+        var text = make('p' , { text: this.props.text });
 
-        if (this.reply.isRecent) {
+        if (this.props.isRecent) {
             this.view = group([name, text], 'li', { class: 'recent-reply' });
         } else {
             this.view = group([name, text], 'li');
@@ -17,6 +17,6 @@ Reply.prototype = {
     },
 
     mount: function() {
-        getView(this.context).appendChild(getView(this));
+        getView(this.replyList).appendChild(getView(this));
     }
 };

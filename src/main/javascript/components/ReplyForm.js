@@ -1,9 +1,8 @@
-function ReplyForm(context) {
-    this.context = context;  // Thread
-
+function ReplyForm(thread) {
+    this.thread = thread;  // context
+    this.view = null;
     this.nameInput = null;
     this.replyInput = null;
-    this.view = null;
 }
 
 ReplyForm.prototype = {
@@ -18,22 +17,25 @@ ReplyForm.prototype = {
         return function(evt) {
             evt.preventDefault();
 
+            var data = {
+                username: self.nameInput.value,
+                text: self.replyInput.value
+            };
+
+            var showSubmittedReply = function(data) {
+                self.context.addReply({
+                    username: self.nameInput.value,
+                    text: self.replyInput.value,
+                    isRecent: true
+                });
+                self.unmount();
+            };
+
             ajax({
                 method: 'POST',
-                url: baseUrl + '/api/thread/' +
-                    self.context.thread.id + '/comment',
-                success: function(data) {
-                    self.context.addReply({
-                        username: self.nameInput.value,
-                        text: self.replyInput.value,
-                        isRecent: true
-                    });
-                    self.unmount();
-                },
-                data: {
-                    username: self.nameInput.value,
-                    text: self.replyInput.value
-                }
+                url: baseUrl + '/api/thread/' + self.thread.props.id + '/comment',
+                data: data,
+                success: showSubmittedReply
             });
         };
     },
@@ -71,16 +73,16 @@ ReplyForm.prototype = {
 
     mount: function() {
         // replace reply link with this form
-        getView(this.context).replaceChild(
+        getView(this.thread).replaceChild(
             getView(this),
-            this.context.replyLink
+            this.thread.replyLink
         );
     },
 
     unmount: function() {
         // replace this form with reply link
-        getView(this.context).replaceChild(
-            this.context.replyLink,
+        getView(this.thread).replaceChild(
+            this.thread.replyLink,
             getView(this)
         );
 

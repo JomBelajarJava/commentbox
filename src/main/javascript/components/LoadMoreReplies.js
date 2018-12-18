@@ -1,5 +1,5 @@
-function LoadMoreReplies(context, cursorAfter) {
-    this.context = context;  // ReplyList
+function LoadMoreReplies(replyList, cursorAfter) {
+    this.replyList = replyList;  // context
     this.cursorAfter = cursorAfter;
     this.view = null;
 }
@@ -11,12 +11,11 @@ LoadMoreReplies.prototype = {
 
             ajax({
                 method: 'GET',
-                url: baseUrl + '/api/thread/' +
-                    self.context.context.thread.id +
+                url: baseUrl + '/api/thread/' + self.replyList.thread.props.id +
                     '/comments?cursorAfter=' + self.cursorAfter,
                 parse: true,
-                success: function(moreReplies) {
-                    self.context.loadMoreReplies(moreReplies);
+                success: function(replies) {
+                    self.replyList.loadMoreReplies(replies);
                 }
             });
         };
@@ -34,11 +33,11 @@ LoadMoreReplies.prototype = {
     },
 
     mount: function() {
-        getView(this.context).appendChild(getView(this));
+        getView(this.replyList).appendChild(getView(this));
     },
 
     unmount: function() {
-        getView(this.context).removeChild(getView(this));
-        this.context.loadMore = null;
+        getView(this.replyList).removeChild(getView(this));
+        this.replyList.loadMore = null;
     }
 };

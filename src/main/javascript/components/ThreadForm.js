@@ -9,26 +9,26 @@ function ThreadForm(context) {
 }
 
 ThreadForm.prototype = {
-    showNewThread: function(self) {
-        return function(thread) {
-            self.context.threadList.prepend(thread);
-            self.commentInput.value = '';
-        };
-    },
-
-    openThread: function(self) {
+    submit: function(self) {
         return function(evt) {
             evt.preventDefault();
+
+            var data = {
+                username: self.usernameInput.value,
+                text: self.commentInput.value
+            };
+
+            var showNewThread = function(thread) {
+                self.context.threadList.prepend(thread);
+                self.commentInput.value = '';
+            };
 
             ajax({
                 method: 'POST',
                 url: baseUrl + '/api/thread',
-                success: self.showNewThread(self),
                 parse: true,
-                data: {
-                    username: self.usernameInput.value,
-                    text: self.commentInput.value
-                }
+                data: data,
+                success: showNewThread
             });
         };
     },
@@ -46,7 +46,7 @@ ThreadForm.prototype = {
 
         this.submitButton = make('a', {
             href: '#',
-            onclick: this.openThread(this),
+            onclick: this.submit(this),
             text: 'Post comment'
         });
 

@@ -1,32 +1,17 @@
-function ReplyList(context, replies) {
-    this.context = context;  // Thread
-    this.replies = [];
-    this.loadMore = null;
+function ReplyList(thread, replies) {
+    this.thread = thread;  // context
+    this.props = replies;
     this.view = null;
-
-    for (var i = 0; i < replies.length; i++) {
-        var reply = new Reply(this, replies[i]);
-        this.replies.push(reply);
-    }
+    this.loadMore = null;
+    this.replies = [];
 }
 
 ReplyList.prototype = {
     prepend: function(data) {
+        this.props.unshift(data);
+
         var reply = new Reply(this, data);
-        this.replies.unshift(data);
         getView(this).insertBefore(getView(reply), getView(this).firstChild);
-    },
-
-    loadMoreReplies: function(moreReplies) {
-        this.loadMore.unmount();
-
-        for (var i = 0; i < moreReplies.length; i++) {
-            var reply = new Reply(this, moreReplies[i]);
-            this.replies.push(reply);
-            reply.mount();
-        }
-
-        this.renderLoadMore();
     },
 
     renderLoadMore: function() {
@@ -38,21 +23,32 @@ ReplyList.prototype = {
         }
     },
 
+    loadMoreReplies: function(replies) {
+        this.loadMore.unmount();
+        this.renderReplies(replies);
+        this.renderLoadMore();
+    },
+
+    renderReplies: function(replies) {
+        for (var i = 0; i < replies.length; i++) {
+            var reply = new Reply(this, replies[i]);
+            reply.mount();
+            this.replies.push(reply);
+        }
+    },
+
     render: function() {
         this.view = make('ul');
-        for (var i = 0; i < this.replies.length; i++) {
-            this.replies[i].mount();
-        }
-
+        this.renderReplies(this.props);
         this.renderLoadMore();
     },
 
     mount: function() {
-        getView(this.context).appendChild(getView(this));
+        getView(this.thread).appendChild(getView(this));
     },
 
     unmount: function() {
-        getView(this.context).removeChild(getView(this));
-        this.context.replyList = null;
+        getView(this.thread).removeChild(getView(this));
+        this.thread.replyList = null;
     }
 };
