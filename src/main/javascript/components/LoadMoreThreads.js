@@ -1,7 +1,6 @@
 function LoadMoreThreads(threadList, cursorAfter) {
     this.threadList = threadList;  // context
     this.cursorAfter = cursorAfter;
-    this.view = null;
 }
 
 LoadMoreThreads.prototype = {
@@ -9,31 +8,34 @@ LoadMoreThreads.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            $.ajax({
-                url: baseUrl + '/api/threads?cursorAfter=' + self.cursorAfter,
-                crossDomain: true,
-                success: function(response) {
+            axios
+                .get(baseUrl + '/api/threads', {
+                    params: { cursorAfter: self.cursorAfter }
+                })
+                .then(function(response) {
                     self.threadList.loadMoreThreads(response.data);
-                }
-            });
+                });
         };
     },
 
     render: function() {
-        var link = $('<a/>')
-            .attr('href', '#')
-            .click(this.loadMoreListener(this))
-            .text('Load more comments');
-
-        this.view = $('<li/>').addClass('load-more').append(link);
+        setView(this,
+            ui('li', { class: 'load-more' },
+               ui('a', {
+                   href: '#',
+                   onclick: this.loadMoreListener(this),
+                   text: 'Load more comments'
+               })
+              )
+        );
     },
 
     mount: function() {
-        getView(this.threadList).append(getView(this));
+        getView(this.threadList).appendChild(getView(this));
     },
 
     unmount: function() {
-        getView(this).remove();
+        getView(this.threadList).removeChild(getView(this));
         this.threadList.loadMore = null;
     }
 };
