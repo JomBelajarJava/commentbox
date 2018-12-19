@@ -15,7 +15,7 @@ var init = function() {
 
     $.ajax({
         url: baseUrl + '/api/threads/latest',
-        dataType: 'jsonp',
+        crossDomain: true,
         success: function(response) {
             var threadList = new ThreadList(context, response.data);
             threadList.mount();

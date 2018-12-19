@@ -11,7 +11,7 @@ LoadMoreThreads.prototype = {
 
             $.ajax({
                 url: baseUrl + '/api/threads?cursorAfter=' + self.cursorAfter,
-                dataType: 'jsonp',
+                crossDomain: true,
                 success: function(response) {
                     self.threadList.loadMoreThreads(response.data);
                 }

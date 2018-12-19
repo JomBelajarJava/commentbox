@@ -12,7 +12,7 @@ LoadMoreReplies.prototype = {
             $.ajax({
                 url: baseUrl + '/api/thread/' + self.replyList.thread.props.id +
                     '/comments?cursorAfter=' + self.cursorAfter,
-                dataType: 'jsonp',
+                crossDomain: true,
                 success: function(response) {
                     self.replyList.loadMoreReplies(response.data);
                 }

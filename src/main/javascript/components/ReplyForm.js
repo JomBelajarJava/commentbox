@@ -35,7 +35,7 @@ ReplyForm.prototype = {
                 method: 'POST',
                 url: baseUrl + '/api/thread/' + self.thread.props.id + '/comment',
                 data: data,
-                dataType: 'jsonp',
+                crossDomain: true,
                 success: showSubmittedReply
             });
         };

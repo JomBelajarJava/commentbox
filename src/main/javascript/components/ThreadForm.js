@@ -27,7 +27,7 @@ ThreadForm.prototype = {
                 method: 'POST',
                 url: baseUrl + '/api/thread',
                 data: data,
-                dataType: 'jsonp',
+                crossDomain:true,
                 success: showNewThread
             });
         };

@@ -52,7 +52,7 @@ Thread.prototype = {
                 $.ajax({
                     url: baseUrl + '/api/thread/' + self.props.id +
                         '/comments/earliest',
-                    dataType: 'jsonp',
+                    crossDomain: true,
                     success: showReplies
                 });
             }

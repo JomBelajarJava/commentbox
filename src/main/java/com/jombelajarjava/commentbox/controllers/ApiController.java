@@ -1,7 +1,5 @@
 package com.jombelajarjava.commentbox.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jombelajarjava.commentbox.database.entities.Comment;
 import com.jombelajarjava.commentbox.services.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,62 +8,52 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "https://www.jombelajarjava.com")
 public class ApiController {
-    private static final String APPLICATION_JAVASCRIPT_VALUE = "application/javascript";
-
     @Autowired
     private CommentService commentService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    /**
+     * GET Requests
+     */
 
-
-
-    @GetMapping(value = "/api/threads/latest", produces = APPLICATION_JAVASCRIPT_VALUE)
-    public String latestThreads(@RequestParam String callback) {
+    @GetMapping("/api/threads/latest")
+    public Message latestThreads() {
         List<Comment> threads = commentService.getLatestThreads();
-        return serialize(new Message(threads), callback);
+        return new Message(threads);
     }
 
-    @GetMapping(value = "/api/threads", produces = APPLICATION_JAVASCRIPT_VALUE)
-    public String loadMoreThreads(@RequestParam String cursorAfter, @RequestParam String callback) {
+    @GetMapping("/api/threads")
+    public Message loadMoreThreads(@RequestParam String cursorAfter) {
         List<Comment> threads = commentService.getThreads(cursorAfter);
-        return serialize(new Message(threads), callback);
+        return new Message(threads);
     }
 
-    @GetMapping(value = "/api/thread/{threadId}/comments/earliest", produces = APPLICATION_JAVASCRIPT_VALUE)
-    public String replies(@PathVariable Long threadId, @RequestParam String callback) {
+    @GetMapping("/api/thread/{threadId}/comments/earliest")
+    public Message replies(@PathVariable Long threadId) {
         List<Comment> replies = commentService.getEarliestReplies(threadId);
-        return serialize(new Message(replies), callback);
+        return new Message(replies);
     }
 
-    @GetMapping(value = "/api/thread/{threadId}/comments", produces = APPLICATION_JAVASCRIPT_VALUE)
-    public String moreReplies(@PathVariable Long threadId, @RequestParam String cursorAfter,
-                              @RequestParam String callback) {
+    @GetMapping("/api/thread/{threadId}/comments")
+    public Message moreReplies(@PathVariable Long threadId, @RequestParam String cursorAfter) {
         List<Comment> replies = commentService.getReplies(threadId, cursorAfter);
-        return serialize(new Message(replies), callback);
+        return new Message(replies);
     }
 
-    @GetMapping(value = "/api/thread", produces = APPLICATION_JAVASCRIPT_VALUE)
-    public String openThread(@ModelAttribute Comment comment, @RequestParam String callback) {
+    /**
+     * POST Requests
+     */
+
+    @PostMapping("/api/thread")
+    public Message openThread(@ModelAttribute Comment comment) {
         Comment thread = commentService.addThread(comment);
-        return serialize(new Message(thread), callback);
+        return new Message(thread);
     }
 
-    @GetMapping(value = "/api/thread/{threadId}/comment", produces = APPLICATION_JAVASCRIPT_VALUE)
-    public String  sendReply(@PathVariable Long threadId, @ModelAttribute Comment comment,
-                             @RequestParam String callback) {
+    @PostMapping("/api/thread/{threadId}/comment")
+    public Message  sendReply(@PathVariable Long threadId, @ModelAttribute Comment comment) {
         commentService.addReply(threadId, comment);
-        return serialize(new Message(""), callback);
-    }
-
-
-
-    private String serialize(Message message, String callback) {
-        try {
-            return callback + "(" + objectMapper.writeValueAsString(message) + ");";
-        } catch (JsonProcessingException e) {
-            return e.getMessage();
-        }
+        return new Message("");
     }
 }
