@@ -15,7 +15,7 @@ public class DatabaseInitializer implements ServletContextListener {
         ObjectifyService.init(new ObjectifyFactory(
                 DatastoreOptions.newBuilder()
                         .setHost("http://localhost:8081")
-                        .setProjectId("hello-225223")
+                        .setProjectId("vivid-reality-225905")
                         .build()
                         .getService()
         ));
@@ -23,8 +23,8 @@ public class DatabaseInitializer implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-//        ObjectifyService.init();  // TODO: use this for prod instead of useDatastoreEmulator()
-        useDatastoreEmulator();
+        ObjectifyService.init();  // TODO: use this for prod instead of useDatastoreEmulator()
+//        useDatastoreEmulator();
         ObjectifyService.register(Comment.class);
     }
 }

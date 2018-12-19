@@ -18,74 +18,65 @@ ReplyForm.prototype = {
             evt.preventDefault();
 
             var data = {
-                username: self.nameInput.value,
-                text: self.replyInput.value
+                username: self.nameInput.val(),
+                text: self.replyInput.val()
             };
 
-            var showSubmittedReply = function(data) {
+            var showSubmittedReply = function() {
                 self.thread.addReply({
-                    username: self.nameInput.value,
-                    text: self.replyInput.value,
+                    username: self.nameInput.val(),
+                    text: self.replyInput.val(),
                     isRecent: true
                 });
                 self.unmount();
             };
 
-            ajax({
+            $.ajax({
                 method: 'POST',
                 url: baseUrl + '/api/thread/' + self.thread.props.id + '/comment',
                 data: data,
+                crossDomain: true,
                 success: showSubmittedReply
             });
         };
     },
 
     render: function() {
-        this.nameInput = make('input', {
-            type: 'text',
-            placeholder: 'Name'
-        });
-        this.replyInput = make('textarea', {
-            rows: 6,
-            placeholder: 'Write reply'
-        });
+        this.nameInput = $('<input>')
+            .attr('type', 'text')
+            .attr('placeholder', 'Name');
 
-        var name = wrap(this.nameInput, 'p');
-        var reply = wrap(this.replyInput, 'p');
+        this.replyInput = $('<textarea/>')
+            .attr('rows', 6)
+            .attr('placeholder', 'Write reply');
 
-        var cancel = make('a', {
-            href: '#',
-            onclick: this.cancelListener(this),
-            text: 'Cancel'
-        });
-        var submit = make('a', {
-            href: '#',
-            onclick: this.submitListener(this),
-            text: 'Post reply'
-        });
-        var buttons = group(
-            [cancel, submit],
-            'p', { class: 'form-buttons-container' }
-        );
+        var name = $('<p/>').append(this.nameInput);
+        var reply = $('<p/>').append(this.replyInput);
 
-        this.view = group([name, reply, buttons], 'div');
+        var cancel = $('<a/>')
+            .attr('href', '#')
+            .click(this.cancelListener(this))
+            .text('Cancel');
+        var submit = $('<a/>')
+            .attr('href', '#')
+            .click(this.submitListener(this))
+            .text('Post reply');
+
+        var buttons = $('<p/>')
+            .addClass('form-buttons-container')
+            .append(cancel, submit);
+
+        this.view = $('<div/>').append(name, reply, buttons);
     },
 
     mount: function() {
-        // replace reply link with this form
-        getView(this.thread).replaceChild(
-            getView(this),
-            this.thread.replyLink
-        );
+        // replace reply link with this form, while keeping events
+        this.thread.replyLink.before(getView(this)).detach();
     },
 
     unmount: function() {
-        // replace this form with reply link
-        getView(this.thread).replaceChild(
-            this.thread.replyLink,
-            getView(this)
-        );
-
+        // replace this form with reply link, while keeping events
+        getView(this).before(this.thread.replyLink).detach();
         context.replyForm = null;
     },
 };

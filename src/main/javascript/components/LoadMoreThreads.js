@@ -9,34 +9,31 @@ LoadMoreThreads.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            ajax({
-                method: 'GET',
+            $.ajax({
                 url: baseUrl + '/api/threads?cursorAfter=' + self.cursorAfter,
-                parse: true,
-                success: function(threads) {
-                    self.threadList.loadMoreThreads(threads);
+                crossDomain: true,
+                success: function(response) {
+                    self.threadList.loadMoreThreads(response.data);
                 }
             });
         };
     },
 
     render: function() {
-        this.view = wrap(
-            make('a', {
-                href: '#',
-                onclick: this.loadMoreListener(this),
-                text: 'Load more comments'
-            }),
-            'li', { class: 'load-more' }
-        );
+        var link = $('<a/>')
+            .attr('href', '#')
+            .click(this.loadMoreListener(this))
+            .text('Load more comments');
+
+        this.view = $('<li/>').addClass('load-more').append(link);
     },
 
     mount: function() {
-        getView(this.threadList).appendChild(getView(this));
+        getView(this.threadList).append(getView(this));
     },
 
     unmount: function() {
-        getView(this.threadList).removeChild(getView(this));
+        getView(this).remove();
         this.threadList.loadMore = null;
     }
 };

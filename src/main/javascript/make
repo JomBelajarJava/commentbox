@@ -1,6 +1,7 @@
 #!/bin/sh
 
-TEMP_FILE=temp
+LIB_TEMP_FILE=temp0
+TEMP_FILE=temp1
 OUTPUT_FILE=embed.js
 OUTPUT_DIR=./dist
 STATIC_DIR=../resources/static
@@ -8,12 +9,22 @@ STATIC_DIR=../resources/static
 rm -rf $OUTPUT_DIR
 mkdir $OUTPUT_DIR
 
+# Bundling libraries
+echo '' > $OUTPUT_DIR/$LIB_TEMP_FILE
+find ./lib -name \*.js -exec cat {} >> $OUTPUT_DIR/$LIB_TEMP_FILE \;
+
+# Bundling components
 echo '' > $OUTPUT_DIR/$TEMP_FILE
 find ./components -name \*.js -exec cat {} >> $OUTPUT_DIR/$TEMP_FILE \;
 
+# Bundle everything to output file
 echo '' > $OUTPUT_DIR/$OUTPUT_FILE
+cat $OUTPUT_DIR/$LIB_TEMP_FILE >> $OUTPUT_DIR/$OUTPUT_FILE
+
+# Scoping function to not expose script variables
 echo '(function(){' >> $OUTPUT_DIR/$OUTPUT_FILE
 cat utils.js $OUTPUT_DIR/$TEMP_FILE index.js >> $OUTPUT_DIR/$OUTPUT_FILE
 echo '})();' >> $OUTPUT_DIR/$OUTPUT_FILE
 
+# Copy output file to directory served by website
 cp $OUTPUT_DIR/$OUTPUT_FILE $STATIC_DIR

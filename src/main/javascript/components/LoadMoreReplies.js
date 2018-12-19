@@ -9,35 +9,34 @@ LoadMoreReplies.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            ajax({
-                method: 'GET',
+            $.ajax({
                 url: baseUrl + '/api/thread/' + self.replyList.thread.props.id +
                     '/comments?cursorAfter=' + self.cursorAfter,
-                parse: true,
-                success: function(replies) {
-                    self.replyList.loadMoreReplies(replies);
+                crossDomain: true,
+                success: function(response) {
+                    self.replyList.loadMoreReplies(response.data);
                 }
             });
         };
     },
 
     render: function() {
-        this.view = wrap(
-            make('a', {
-                href: '#',
-                onclick: this.loadMoreListener(this),
-                text: 'Load more replies'
-            }),
-            'li', { class: 'load-more' }
-        );
+        var link = $('<a/>')
+            .attr('href', '#')
+            .click(this.loadMoreListener(this))
+            .text('Load more replies');
+
+        this.view = $('<li/>')
+            .addClass('load-more')
+            .append(link);
     },
 
     mount: function() {
-        getView(this.replyList).appendChild(getView(this));
+        getView(this.replyList).append(getView(this));
     },
 
     unmount: function() {
-        getView(this.replyList).removeChild(getView(this));
+        getView(this).remove();
         this.replyList.loadMore = null;
     }
 };
