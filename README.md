@@ -28,15 +28,22 @@ cd src/main/javascript
 
 Kemudian jalankan script `make`:
 ```
-./make
+./make --profile=dev
 ```
 
 ## Development
 
 Gunakan command Maven untuk menjalankan aplikasi,
 ```
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.arguments='--spring.profiles.active=development'
 ```
+
+Kalau anda ada menggunakan GNU Screen, anda boleh menggunakan file config `screenrc`:
+```
+screen -c screenc
+```
+
+Anda boleh lihat file tersebut dan tweak mana-mana yang patut.
 
 ## Deployment
 ```
