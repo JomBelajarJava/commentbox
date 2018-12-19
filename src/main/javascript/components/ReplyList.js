@@ -9,8 +9,8 @@ ReplyList.prototype = {
     prepend: function(data) {
         this.props.unshift(data);
 
-        var reply = new Reply(this, data);
-        getView(this).insertBefore(getView(reply), getView(this).firstChild);
+        var newReply = new Reply(this, data);
+        begin(this, newReply);
     },
 
     renderLoadMore: function() {

@@ -11,8 +11,8 @@ ThreadList.prototype = {
     prepend: function(data) {
         this.props.unshift(data);
 
-        var thread = new Thread(this, data);
-        getView(this).insertBefore(getView(thread), getView(this).firstChild);
+        var newThread = new Thread(this, data);
+        begin(this, newThread);
     },
 
     renderLoadMore: function() {

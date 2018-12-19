@@ -37,6 +37,16 @@ var replace = function(element, withElement) {
 };
 
 /*
+ * Put at the beginning of the list, a new component.
+ */
+var begin = function(listComponent, component) {
+    getView(listComponent).insertBefore(
+        getView(component),
+        getView(listComponent).firstChild
+    );
+};
+
+/*
  * Create HTML element from tagName and attributes. 'onclick' attribute will
  * add as event listener. 'text' attribute will be the text node. Other
  * attributes will set as normal attributes.
