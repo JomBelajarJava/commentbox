@@ -1,10 +1,35 @@
+# Example usage:
+#
+# ./make --profile=dev
+#
+# or
+#
+# ./make
+#
+
 #!/bin/sh
+
+ARG=$1
+PROFILE=`echo $ARG | awk '{ print substr( $0, 11 ) }'`
 
 LIB_TEMP_FILE=temp0
 TEMP_FILE=temp1
 OUTPUT_FILE=embed.js
 OUTPUT_DIR=./dist
 STATIC_DIR=../resources/static
+
+DEV_URL=http://localhost:8080
+PROD_URL=https://vivid-reality-225905.appspot.com
+
+compile_index()
+{
+    if [ "$PROFILE" = 'dev' ]
+    then
+        sed "s|{{baseUrl}}|$DEV_URL|" index.js >> $OUTPUT_DIR/$OUTPUT_FILE
+    else
+        sed "s|{{baseUrl}}|$PROD_URL|" index.js >> $OUTPUT_DIR/$OUTPUT_FILE
+    fi
+}
 
 rm -rf $OUTPUT_DIR
 mkdir $OUTPUT_DIR
@@ -23,7 +48,8 @@ cat $OUTPUT_DIR/$LIB_TEMP_FILE >> $OUTPUT_DIR/$OUTPUT_FILE
 
 # Scoping function to not expose script variables
 echo '(function(){' >> $OUTPUT_DIR/$OUTPUT_FILE
-cat utils.js $OUTPUT_DIR/$TEMP_FILE index.js >> $OUTPUT_DIR/$OUTPUT_FILE
+cat utils.js $OUTPUT_DIR/$TEMP_FILE >> $OUTPUT_DIR/$OUTPUT_FILE
+compile_index
 echo '})();' >> $OUTPUT_DIR/$OUTPUT_FILE
 
 # Copy output file to directory served by website

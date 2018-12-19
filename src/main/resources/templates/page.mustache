@@ -4,6 +4,7 @@
     <title>Comment Box &middot; Jom Belajar Java</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Projek demo untuk aplikasi comment box menggunakan Spring Boot">
+    {{#embed}}<link rel=stylesheet href="{{ baseUrl }}/commentbox_style.css">{{/embed}}
     <style>
      main {
          margin: 20px auto;
@@ -54,6 +55,10 @@
         </p>
         <pre><code>{{> snippets/div}}</code></pre>
       </article>
+
+      {{#embed}}<div id="jombelajarjava-commentbox"></div>{{/embed}}
     </main>
+
+    {{#embed}}<script src="{{ baseUrl }}/embed.js"></script>{{/embed}}
   </body>
 </html>

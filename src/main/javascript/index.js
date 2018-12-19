@@ -1,4 +1,4 @@
-var baseUrl = 'https://vivid-reality-225905.appspot.com';
+var baseUrl = '{{baseUrl}}';
 var context = {
     threadForm: null,
     threadList: null,
