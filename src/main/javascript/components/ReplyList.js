@@ -1,7 +1,6 @@
 function ReplyList(thread, replies) {
     this.thread = thread;  // context
     this.props = replies;
-    this.view = null;
     this.loadMore = null;
     this.replies = [];
 }
@@ -11,7 +10,7 @@ ReplyList.prototype = {
         this.props.unshift(data);
 
         var reply = new Reply(this, data);
-        getView(this).prepend(getView(reply));
+        getView(this).insertBefore(getView(reply), getView(this).firstChild);
     },
 
     renderLoadMore: function() {
@@ -40,17 +39,17 @@ ReplyList.prototype = {
     },
 
     render: function() {
-        this.view = $('<ul/>');
+        setView(this, ui('ul'));
         this.renderReplies(this.props);
         this.renderLoadMore();
     },
 
     mount: function() {
-        getView(this.thread).append(getView(this));
+        getView(this.thread).appendChild(getView(this));
     },
 
     unmount: function() {
-        getView(this).remove();
+        getView(this.thread).removeChild(getView(this));
         this.thread.replyList = null;
     }
 };

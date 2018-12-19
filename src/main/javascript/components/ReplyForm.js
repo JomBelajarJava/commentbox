@@ -1,6 +1,5 @@
 function ReplyForm(thread) {
     this.thread = thread;  // context
-    this.view = null;
     this.nameInput = null;
     this.replyInput = null;
 }
@@ -17,66 +16,76 @@ ReplyForm.prototype = {
         return function(evt) {
             evt.preventDefault();
 
+            var url = baseUrl + '/api/thread/' + self.thread.props.id + '/comment';
+
             var data = {
-                username: self.nameInput.val(),
-                text: self.replyInput.val()
+                username: self.nameInput.value,
+                text: self.replyInput.value
             };
 
             var showSubmittedReply = function() {
                 self.thread.addReply({
-                    username: self.nameInput.val(),
-                    text: self.replyInput.val(),
+                    username: self.nameInput.value,
+                    text: self.replyInput.value,
                     isRecent: true
                 });
                 self.unmount();
             };
 
-            $.ajax({
-                method: 'POST',
-                url: baseUrl + '/api/thread/' + self.thread.props.id + '/comment',
-                data: data,
-                crossDomain: true,
-                success: showSubmittedReply
-            });
+            axios
+                .post(url, data)
+                .then(showSubmittedReply);
         };
     },
 
     render: function() {
-        this.nameInput = $('<input>')
-            .attr('type', 'text')
-            .attr('placeholder', 'Name');
+        this.nameInput = ui('input', {
+            type: 'text',
+            placeholder: 'Name'
+        });
 
-        this.replyInput = $('<textarea/>')
-            .attr('rows', 6)
-            .attr('placeholder', 'Write reply');
+        this.replyInput = ui('textarea', {
+            rows: 6,
+            placeholder: 'Write reply'
+        });
 
-        var name = $('<p/>').append(this.nameInput);
-        var reply = $('<p/>').append(this.replyInput);
+        var name = ui('p', null, this.nameInput);
+        var reply = ui('p', null, this.replyInput);
 
-        var cancel = $('<a/>')
-            .attr('href', '#')
-            .click(this.cancelListener(this))
-            .text('Cancel');
-        var submit = $('<a/>')
-            .attr('href', '#')
-            .click(this.submitListener(this))
-            .text('Post reply');
-
-        var buttons = $('<p/>')
-            .addClass('form-buttons-container')
-            .append(cancel, submit);
-
-        this.view = $('<div/>').append(name, reply, buttons);
+        setView(this,
+            ui('div', null, [
+                name,
+                reply,
+                ui('p', { class: 'form-buttons-container' }, [
+                    ui('a', {
+                        href: '#',
+                        onclick: this.cancelListener(this),
+                        text: 'Cancel'
+                    }),
+                    ui('a', {
+                        href: '#',
+                        onclick: this.submitListener(this),
+                        text: 'Post reply'
+                    })
+                ])
+            ])
+        );
     },
 
     mount: function() {
-        // replace reply link with this form, while keeping events
-        this.thread.replyLink.before(getView(this)).detach();
+        // replace reply link with this form
+        getView(this.thread).replaceChild(
+            getView(this),
+            this.thread.replyLink
+        );
     },
 
     unmount: function() {
-        // replace this form with reply link, while keeping events
-        getView(this).before(this.thread.replyLink).detach();
+        // replace this form with reply link
+        getView(this.thread).replaceChild(
+            this.thread.replyLink,
+            getView(this)
+        );
         context.replyForm = null;
     },
 };

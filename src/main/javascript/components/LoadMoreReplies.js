@@ -1,7 +1,6 @@
 function LoadMoreReplies(replyList, cursorAfter) {
     this.replyList = replyList;  // context
     this.cursorAfter = cursorAfter;
-    this.view = null;
 }
 
 LoadMoreReplies.prototype = {
@@ -9,34 +8,35 @@ LoadMoreReplies.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            $.ajax({
-                url: baseUrl + '/api/thread/' + self.replyList.thread.props.id +
-                    '/comments?cursorAfter=' + self.cursorAfter,
-                crossDomain: true,
-                success: function(response) {
+            var url = baseUrl + '/api/thread/' + self.replyList.thread.props.id +
+                '/comments?cursorAfter=' + self.cursorAfter;
+
+            axios
+                .get(url)
+                .then(function(response) {
                     self.replyList.loadMoreReplies(response.data);
-                }
-            });
+                });
         };
     },
 
     render: function() {
-        var link = $('<a/>')
-            .attr('href', '#')
-            .click(this.loadMoreListener(this))
-            .text('Load more replies');
-
-        this.view = $('<li/>')
-            .addClass('load-more')
-            .append(link);
+        setView(this,
+            ui('li', { class: 'load-more' },
+               ui('a', {
+                   href: '#',
+                   onclick: this.loadMoreListener(this),
+                   text: 'Load more replies'
+               })
+              )
+        );
     },
 
     mount: function() {
-        getView(this.replyList).append(getView(this));
+        getView(this.replyList).appendChild(getView(this));
     },
 
     unmount: function() {
-        getView(this).remove();
+        getView(this.replyList).removeChild(getView(this));
         this.replyList.loadMore = null;
     }
 };

@@ -3,7 +3,6 @@ function ThreadList(context, threads) {
 
     this.context = context;
     this.props = threads;
-    this.view = null;
     this.loadMore = null;
     this.threads = [];
 }
@@ -13,7 +12,7 @@ ThreadList.prototype = {
         this.props.unshift(data);
 
         var thread = new Thread(this, data);
-        getView(this).prepend(getView(thread));
+        getView(this).insertBefore(getView(thread), getView(this).firstChild);
     },
 
     renderLoadMore: function() {
@@ -44,12 +43,12 @@ ThreadList.prototype = {
     },
 
     render: function() {
-        this.view = $('<ul/>').addClass('thread-list');
+        setView(this, ui('ul', { class: 'thread-list' }));
         this.renderThreads(this.props);
         this.renderLoadMore();
     },
 
     mount: function() {
-        getView(this.context).append(getView(this));
+        getView(this.context).appendChild(getView(this));
     }
 };

@@ -45,6 +45,7 @@ find ./components -name \*.js -exec cat {} >> $OUTPUT_DIR/$TEMP_FILE \;
 # Bundle everything to output file
 echo '' > $OUTPUT_DIR/$OUTPUT_FILE
 cat $OUTPUT_DIR/$LIB_TEMP_FILE >> $OUTPUT_DIR/$OUTPUT_FILE
+echo '' >> $OUTPUT_DIR/$OUTPUT_FILE
 
 # Scoping function to not expose script variables
 echo '(function(){' >> $OUTPUT_DIR/$OUTPUT_FILE
