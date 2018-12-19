@@ -55,6 +55,6 @@ ThreadForm.prototype = {
     },
 
     mount: function () {
-        getView(this.context).appendChild(getView(this));
+        attach(this, this.context);
     }
 };

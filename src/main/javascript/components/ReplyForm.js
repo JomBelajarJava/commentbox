@@ -73,19 +73,11 @@ ReplyForm.prototype = {
     },
 
     mount: function() {
-        // replace reply link with this form
-        getView(this.thread).replaceChild(
-            getView(this),
-            this.thread.replyLink
-        );
+        replace(this.thread.replyLink, getView(this));
     },
 
     unmount: function() {
-        // replace this form with reply link
-        getView(this.thread).replaceChild(
-            this.thread.replyLink,
-            getView(this)
-        );
+        replace(getView(this), this.thread.replyLink);
         context.replyForm = null;
     },
 };

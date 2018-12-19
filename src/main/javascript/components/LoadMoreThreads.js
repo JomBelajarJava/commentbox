@@ -31,11 +31,11 @@ LoadMoreThreads.prototype = {
     },
 
     mount: function() {
-        getView(this.threadList).appendChild(getView(this));
+        attach(this, this.threadList);
     },
 
     unmount: function() {
-        getView(this.threadList).removeChild(getView(this));
+        detach(this, this.threadList);
         this.threadList.loadMore = null;
     }
 };

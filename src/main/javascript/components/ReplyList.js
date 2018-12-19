@@ -45,11 +45,11 @@ ReplyList.prototype = {
     },
 
     mount: function() {
-        getView(this.thread).appendChild(getView(this));
+        attach(this, this.thread);
     },
 
     unmount: function() {
-        getView(this.thread).removeChild(getView(this));
+        detach(this, this.thread);
         this.thread.replyList = null;
     }
 };

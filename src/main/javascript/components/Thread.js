@@ -97,6 +97,6 @@ Thread.prototype = {
     },
 
     mount: function() {
-        getView(this.threadList).appendChild(getView(this));
+        attach(this, this.threadList);
     }
 };

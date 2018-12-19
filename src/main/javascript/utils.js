@@ -16,6 +16,27 @@ var setView = function(component, element) {
 };
 
 /*
+ * Attach component view to another component view (appendChild).
+ */
+var attach = function(component, to) {
+    getView(to).appendChild(getView(component));
+};
+
+/*
+ * Detach component view from another component view (removeChild).
+ */
+var detach = function(component, from) {
+    getView(from).removeChild(getView(component));
+};
+
+/*
+ * Replace element with another element.
+ */
+var replace = function(element, withElement) {
+    element.parentElement.replaceChild(withElement, element);
+};
+
+/*
  * Create HTML element from tagName and attributes. 'onclick' attribute will
  * add as event listener. 'text' attribute will be the text node. Other
  * attributes will set as normal attributes.

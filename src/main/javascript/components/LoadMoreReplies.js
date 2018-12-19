@@ -32,11 +32,11 @@ LoadMoreReplies.prototype = {
     },
 
     mount: function() {
-        getView(this.replyList).appendChild(getView(this));
+        attach(this, this.replyList);
     },
 
     unmount: function() {
-        getView(this.replyList).removeChild(getView(this));
+        detach(this, this.replyList);
         this.replyList.loadMore = null;
     }
 };
