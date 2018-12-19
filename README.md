@@ -37,3 +37,8 @@ Gunakan command Maven untuk menjalankan aplikasi,
 ```
 ./mvnw spring-boot:run
 ```
+
+## Deployment
+```
+./mvnw clean appengine:deploy
+```
