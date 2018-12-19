@@ -1,4 +1,4 @@
-var baseUrl = 'http://localhost:8080';
+var baseUrl = 'https://vivid-reality-225905.appspot.com';
 var context = {
     threadForm: null,
     threadList: null,

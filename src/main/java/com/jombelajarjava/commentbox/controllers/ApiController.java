@@ -46,13 +46,13 @@ public class ApiController {
         return serialize(new Message(replies), callback);
     }
 
-    @PostMapping(value = "/api/thread", produces = APPLICATION_JAVASCRIPT_VALUE)
+    @GetMapping(value = "/api/thread", produces = APPLICATION_JAVASCRIPT_VALUE)
     public String openThread(@ModelAttribute Comment comment, @RequestParam String callback) {
         Comment thread = commentService.addThread(comment);
         return serialize(new Message(thread), callback);
     }
 
-    @PostMapping(value = "/api/thread/{threadId}/comment", produces = APPLICATION_JAVASCRIPT_VALUE)
+    @GetMapping(value = "/api/thread/{threadId}/comment", produces = APPLICATION_JAVASCRIPT_VALUE)
     public String  sendReply(@PathVariable Long threadId, @ModelAttribute Comment comment,
                              @RequestParam String callback) {
         commentService.addReply(threadId, comment);

@@ -23,8 +23,8 @@ public class DatabaseInitializer implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-//        ObjectifyService.init();  // TODO: use this for prod instead of useDatastoreEmulator()
-        useDatastoreEmulator();
+        ObjectifyService.init();  // TODO: use this for prod instead of useDatastoreEmulator()
+//        useDatastoreEmulator();
         ObjectifyService.register(Comment.class);
     }
 }
