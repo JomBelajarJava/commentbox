@@ -32,6 +32,8 @@ ThreadList.prototype = {
         this.loadMore.unmount();
         this.renderThreads(threads);
         this.renderLoadMore();
+
+        updateHeight(this);
     },
 
     renderThreads: function(threads) {
@@ -49,6 +51,10 @@ ThreadList.prototype = {
     },
 
     mount: function() {
+        var computedHeight = computeHeight(this);
+
+        getView(this).style.height = 0;
         attach(this, this.context);
+        expand(this, computedHeight);
     }
 };

@@ -28,6 +28,7 @@ ReplyList.prototype = {
         this.loadMore.unmount();
         this.renderReplies(replies);
         this.renderLoadMore();
+        updateHeight(this);
     },
 
     renderReplies: function(replies) {
@@ -39,13 +40,17 @@ ReplyList.prototype = {
     },
 
     render: function() {
-        setView(this, ui('ul'));
+        setView(this, ui('ul', { class: 'reply-list' }));
         this.renderReplies(this.props);
         this.renderLoadMore();
     },
 
     mount: function() {
+        var computedHeight = computeHeight(this);
+
+        getView(this).style.height = 0;
         attach(this, this.thread);
+        expand(this, computedHeight);
     },
 
     unmount: function() {

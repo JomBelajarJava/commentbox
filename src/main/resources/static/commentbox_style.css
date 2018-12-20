@@ -16,14 +16,20 @@
 #jombelajarjava-commentbox .thread-list {
     padding: 0;
     margin: 0;
+    transition: height .3s;
 }
 #jombelajarjava-commentbox .load-more {
     text-align: center;
 }
 
+#jombelajarjava-commentbox .reply-list {
+    transition: height .3s;
+}
+
 #jombelajarjava-commentbox li {
     list-style-type: none;
     padding: 1px 16px;
+    overflow: hidden;
 }
 #jombelajarjava-commentbox .reply-button {
     text-align: right;

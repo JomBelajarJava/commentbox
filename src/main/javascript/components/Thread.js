@@ -35,10 +35,14 @@ Thread.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            if (self.repliesLoaded) {
+            var hideReplies = function() {
                 self.replyList.unmount();
                 self.renderRepliesCount();
                 self.repliesLoaded = false;
+            };
+
+            if (self.repliesLoaded) {
+                hideReplies();
             } else {
                 var showReplies = function(response) {
                     var replies = response.data;
