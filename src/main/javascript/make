@@ -49,7 +49,7 @@ echo '' >> $OUTPUT_DIR/$OUTPUT_FILE
 
 # Scoping function to not expose script variables
 echo '(function(){' >> $OUTPUT_DIR/$OUTPUT_FILE
-cat utils.js $OUTPUT_DIR/$TEMP_FILE >> $OUTPUT_DIR/$OUTPUT_FILE
+cat utils.js animations.js $OUTPUT_DIR/$TEMP_FILE >> $OUTPUT_DIR/$OUTPUT_FILE
 compile_index
 echo '})();' >> $OUTPUT_DIR/$OUTPUT_FILE
 

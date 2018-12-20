@@ -23,7 +23,7 @@
 }
 
 #jombelajarjava-commentbox .reply-list {
-    transition: height .3s;
+    transition: height .3s, opacity .3s;
 }
 
 #jombelajarjava-commentbox li {

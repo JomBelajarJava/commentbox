@@ -54,7 +54,11 @@ ReplyList.prototype = {
     },
 
     unmount: function() {
-        detach(this, this.thread);
-        this.thread.replyList = null;
+        var self = this;
+        var callback = function() {
+            detach(self, self.thread);
+        };
+
+        collapse(this, callback);
     }
 };
