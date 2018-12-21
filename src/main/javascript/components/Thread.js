@@ -4,6 +4,7 @@ function Thread(threadList, thread) {
     this.viewReplyLink = null;
     this.replyLink = null;
     this.replyList = null;
+    this.replyForm = null;
 
     this.repliesLoaded = false;
 }
@@ -67,11 +68,8 @@ Thread.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            if (context.replyForm !== null) {
-                context.replyForm.unmount();
-            }
-            context.replyForm = new ReplyForm(self);
-            context.replyForm.mount();
+            self.replyForm = new ReplyForm(self);
+            self.replyForm.mount();
         };
     },
 

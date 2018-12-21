@@ -1,21 +1,19 @@
 /*
- * Compute rendered height of a component. Using a trick by attaching the HTML
+ * Compute rendered height of an element. Using a trick by attaching the HTML
  * element sneakily, then get the height, and detach back.
  */
-var computeHeight = function(component) {
-    var element = getView(component);
-
+var computeHeight = function(element) {
     var initialPosition = element.style.position;
     var initialVisibility = element.style.visibility;
 
     element.style.position = 'absolute';
     element.style.visibility = 'hidden';
 
-    attach(component, context);
+    getView(context).appendChild(element);
 
     var computedHeight = element.offsetHeight;
 
-    detach(component, context);
+    getView(context).removeChild(element);
 
     element.style.position = initialPosition;
     element.style.visibility = initialVisibility;
@@ -24,13 +22,13 @@ var computeHeight = function(component) {
 };
 
 /*
- * Expand animation.
+ * Expand animation. initialHeight is optional.
  */
-var expand = function(component, computedHeight) {
+var expand = function(component, computedHeight, initialHeight) {
     var element = getView(component);
 
     function initiate(timestamp) {
-        if (element.offsetHeight === 0) {
+        if (element.offsetHeight === initialHeight || element.offsetHeight === 0) {
             element.style.height = computedHeight + 'px';
             requestAnimationFrame(initiate);
         }
@@ -39,15 +37,19 @@ var expand = function(component, computedHeight) {
 };
 
 /*
- * Collapse animation.
+ * Collapse animation. finalHeight is optional.
  */
-var collapse = function(component, callback) {
+var collapse = function(component, callback, finalHeight) {
     var element = getView(component);
-    element.style.height = 0;
+    element.style.height = (finalHeight || 0) + 'px';
     element.style.opacity = 0;
 
     function finishingAnimation(timestamp) {
-        if (element.offsetHeight === 0) {
+        var condition = finalHeight ?
+            (element.offsetHeight === finalHeight) :
+            (element.offsetHeight === 0);
+
+        if (condition) {
             callback();
         } else {
             requestAnimationFrame(finishingAnimation);

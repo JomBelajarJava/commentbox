@@ -53,31 +53,43 @@ ReplyForm.prototype = {
         var reply = ui('p', null, this.replyInput);
 
         setView(this,
-            ui('div', null, [
-                name,
-                reply,
-                ui('p', { class: 'form-buttons-container' }, [
-                    ui('a', {
-                        href: '#',
-                        onclick: this.cancelListener(this),
-                        text: 'Cancel'
-                    }),
-                    ui('a', {
-                        href: '#',
-                        onclick: this.submitListener(this),
-                        text: 'Post reply'
-                    })
+                ui('div', { class: 'reply-form' }, [
+                    name,
+                    reply,
+                    ui('p', { class: 'form-buttons-container' }, [
+                        ui('a', {
+                            href: '#',
+                            onclick: this.cancelListener(this),
+                            text: 'Cancel'
+                        }),
+                        ui('a', {
+                            href: '#',
+                            onclick: this.submitListener(this),
+                            text: 'Post reply'
+                        })
+                    ])
                 ])
-            ])
-        );
+               );
     },
 
     mount: function() {
-        replace(this.thread.replyLink, getView(this));
+        var element = getView(this);
+        var computedHeight = computeHeight(element);
+        var initialHeight = this.thread.replyLink.offsetHeight;
+
+        element.style.height = initialHeight + 'px';
+        replace(this.thread.replyLink, element);
+        expand(this, computedHeight, initialHeight);
     },
 
     unmount: function() {
-        replace(getView(this), this.thread.replyLink);
-        context.replyForm = null;
+        var self = this;
+        var element = getView(self);
+        var finalHeight = computeHeight(self.thread.replyLink);
+        var callback = function() {
+            replace(element, self.thread.replyLink);
+        };
+
+        collapse(self, callback, finalHeight);
     },
 };

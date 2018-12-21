@@ -51,9 +51,10 @@ ThreadList.prototype = {
     },
 
     mount: function() {
-        var computedHeight = computeHeight(this);
+        var element = getView(this);
+        var computedHeight = computeHeight(element);
 
-        getView(this).style.height = 0;
+        element.style.height = 0;
         attach(this, this.context);
         expand(this, computedHeight);
     }
