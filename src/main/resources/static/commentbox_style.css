@@ -47,7 +47,26 @@
     animation: .3s jombelajarjava-flash 4 alternate;
 }
 
+#jombelajarjava-commentbox .loader {
+    border: 3px solid #f3f3f3;
+    border-left: 3px solid #e099ff;
+    border-right: 3px solid #e099ff;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    margin: 0 auto;
+    animation: jombelajarjava-spin 1s linear infinite;
+}
+#jombelajarjava-commentbox .loader-container {
+    /* text-align: center; */
+    margin-left: 100px;
+}
+
 @keyframes jombelajarjava-flash {
     from { background-color: inherit; }
     to { background-color: #bdffbd; }
+}
+@keyframes jombelajarjava-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

@@ -8,11 +8,18 @@ LoadMoreThreads.prototype = {
         return function(evt) {
             evt.preventDefault();
 
+            self.unmount();
+
+            var loader = ui('div', { class: 'loader' });
+            getView(self.threadList).appendChild(loader);
+            updateHeight(self.threadList);
+
             axios
                 .get(baseUrl + '/api/threads', {
                     params: { cursorAfter: self.cursorAfter }
                 })
                 .then(function(response) {
+                    getView(self.threadList).removeChild(loader);
                     self.threadList.loadMoreThreads(response.data);
                 });
         };
@@ -36,6 +43,5 @@ LoadMoreThreads.prototype = {
 
     unmount: function() {
         detach(this, this.threadList);
-        this.threadList.loadMore = null;
     }
 };

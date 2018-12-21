@@ -30,7 +30,6 @@ ThreadList.prototype = {
     loadMoreThreads: function(threads) {
         this.props.concat(threads);
 
-        this.loadMore.unmount();
         this.renderThreads(threads);
         this.renderLoadMore();
 

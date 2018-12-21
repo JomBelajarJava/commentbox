@@ -8,12 +8,19 @@ LoadMoreReplies.prototype = {
         return function(evt) {
             evt.preventDefault();
 
+            self.unmount();
+
+            var loader = ui('div', { class: 'loader' });
+            getView(self.replyList).appendChild(loader);
+            updateHeight(self.replyList);
+
             var url = baseUrl + '/api/thread/' + self.replyList.thread.props.id +
                 '/comments?cursorAfter=' + self.cursorAfter;
 
             axios
                 .get(url)
                 .then(function(response) {
+                    getView(self.replyList).removeChild(loader);
                     self.replyList.loadMoreReplies(response.data);
                 });
         };
@@ -37,6 +44,5 @@ LoadMoreReplies.prototype = {
 
     unmount: function() {
         detach(this, this.replyList);
-        this.replyList.loadMore = null;
     }
 };

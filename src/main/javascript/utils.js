@@ -18,8 +18,17 @@ var setView = function(component, element) {
 /*
  * Attach component view to another component view (appendChild).
  */
-var attach = function(component, to) {
-    getView(to).appendChild(getView(component));
+var attach = function(component, toComponent) {
+    var element = getView(component);
+    var toElement = getView(toComponent);
+    attachElement(element, toElement);
+};
+
+/*
+ * Attach HTML element to another element (appendChild).
+ */
+var attachElement = function(element, toElement) {
+    toElement.appendChild(element);
 };
 
 /*

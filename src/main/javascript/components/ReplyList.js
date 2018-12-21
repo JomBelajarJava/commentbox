@@ -26,7 +26,6 @@ ReplyList.prototype = {
     },
 
     loadMoreReplies: function(replies) {
-        this.loadMore.unmount();
         this.renderReplies(replies);
         this.renderLoadMore();
         updateHeight(this);

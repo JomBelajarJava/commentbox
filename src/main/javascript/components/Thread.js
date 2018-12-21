@@ -1,6 +1,7 @@
 function Thread(threadList, thread) {
     this.threadList = threadList;  // context
     this.props = thread;
+    this.viewReply = null;
     this.viewReplyLink = null;
     this.replyLink = null;
     this.replyList = null;
@@ -49,13 +50,28 @@ Thread.prototype = {
 
                 hideReplies();
             } else {
+                var loader = ui('div', { class: 'loader' });
+
+                // Set height so it will have fixed height, therefore the loader
+                // will not push the other element.
+                self.viewReply.style.height = self.viewReply.offsetHeight + 'px';
+
+                self.viewReply.removeChild(self.viewReplyLink);
+                self.viewReply.appendChild(loader);
+
                 var showReplies = function(response) {
                     var replies = response.data;
 
                     self.replyList = new ReplyList(self, replies);
                     self.replyList.mount();
                     self.viewReplyLink.firstChild.nodeValue = 'Hide replies';
+
+                    self.viewReply.removeChild(loader);
+                    self.viewReply.appendChild(self.viewReplyLink);
+
                     self.repliesLoaded = true;
+
+                    updateHeight(self.threadList);
                 };
 
                 var url = baseUrl + '/api/thread/' + self.props.id +
@@ -85,6 +101,9 @@ Thread.prototype = {
         });
         this.renderRepliesCount();
 
+        this.viewReply = ui('p', { class: 'view-reply-button' },
+                            this.viewReplyLink);
+
         this.replyLink = ui('p', { class: 'reply-button' },
                             ui('a', {
                                 href: '#',
@@ -102,7 +121,7 @@ Thread.prototype = {
                 ui('p', null, ui('b', { text: this.props.username })),
                 ui('p', { text: this.props.text }),
                 this.replyLink,
-                ui('p', { class: 'view-reply-button' }, this.viewReplyLink)
+                this.viewReply
             ])
         );
     },
