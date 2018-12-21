@@ -2,7 +2,7 @@
  * Get view rendered by the component.
  */
 var getView = function(component) {
-    if (component._view === undefined || component._view === null) {
+    if (!component._view) {
         component.render();
     }
     return component._view;
@@ -94,7 +94,7 @@ var _group = function(nodes, tagName, attributes) {
  * Helper function to create HTML elements.
  */
 var ui = function(tagName, attributes, nodes) {
-    if (nodes === undefined || nodes === null) {
+    if (!nodes) {
         return _make(tagName, attributes);
     } else if (Array.isArray(nodes)) {
         return _group(nodes, tagName, attributes);

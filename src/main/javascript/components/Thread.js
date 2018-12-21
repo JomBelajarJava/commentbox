@@ -24,10 +24,9 @@ Thread.prototype = {
 
     addReply: function(reply) {
         this.props.repliesCount++;
+        this.renderRepliesCount();
 
-        if (this.replyList === null) {  // if replyList is not shown
-            this.renderRepliesCount();
-        } else {
+        if (this.replyList) {
             this.replyList.prepend(reply);
         }
     },
