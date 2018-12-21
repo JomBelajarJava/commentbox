@@ -7,7 +7,7 @@ Reply.prototype = {
     render: function() {
         var attr = null;
         if (this.props.isRecent) {
-            attr = { class: 'recent-reply' };
+            attr = { class: 'recent' };
         }
 
         setView(this,

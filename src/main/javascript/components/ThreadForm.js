@@ -18,6 +18,7 @@ ThreadForm.prototype = {
             };
 
             var showNewThread = function(response) {
+                response.data['isRecent'] = true;
                 self.context.threadList.prepend(response.data);
                 self.commentInput.value = '';
             };

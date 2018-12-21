@@ -43,6 +43,11 @@
     text-align: center;
 }
 
-#jombelajarjava-commentbox .recent-reply {
-    background-color: lightgreen;
+#jombelajarjava-commentbox .recent {
+    animation: .3s jombelajarjava-flash 4 alternate;
+}
+
+@keyframes jombelajarjava-flash {
+    from { background-color: inherit; }
+    to { background-color: #bdffbd; }
 }

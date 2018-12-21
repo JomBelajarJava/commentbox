@@ -92,8 +92,13 @@ Thread.prototype = {
                                 text: 'Reply'
                             }));
 
+        var attr = null;
+        if (this.props.isRecent) {
+            attr = { class: 'recent' };
+        }
+
         setView(this,
-            ui('li', null, [
+            ui('li', attr, [
                 ui('p', null, ui('b', { text: this.props.username })),
                 ui('p', { text: this.props.text }),
                 this.replyLink,

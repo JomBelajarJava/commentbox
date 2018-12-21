@@ -13,6 +13,7 @@ ThreadList.prototype = {
 
         var newThread = new Thread(this, data);
         begin(this, newThread);
+        updateHeight(this);
     },
 
     renderLoadMore: function() {

@@ -11,6 +11,7 @@ ReplyList.prototype = {
 
         var newReply = new Reply(this, data);
         begin(this, newReply);
+        updateHeight(this);
     },
 
     renderLoadMore: function() {
