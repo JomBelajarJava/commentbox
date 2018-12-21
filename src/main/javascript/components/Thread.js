@@ -13,21 +13,26 @@ Thread.prototype = {
     renderRepliesCount: function() {
         var textNode = this.viewReplyLink.firstChild;
 
-        if (this.props.repliesCount === 0) {
-            textNode.nodeValue = '';
-        } else if (this.props.repliesCount === 1) {
-            textNode.nodeValue = 'View reply';
-        } else {
-            textNode.nodeValue = 'View ' + this.props.repliesCount + ' replies';
-        }
+        var selectText = function(count) {
+            if (count === 0) {
+                return '';
+            } else if (count === 1) {
+                return 'View reply';
+            } else {
+                return 'View ' + count + ' replies';
+            }
+        };
+
+        textNode.nodeValue = selectText(this.props.repliesCount);
     },
 
     addReply: function(reply) {
         this.props.repliesCount++;
-        this.renderRepliesCount();
 
-        if (this.replyList) {
+        if (this.repliesLoaded) {
             this.replyList.prepend(reply);
+        } else {
+            this.renderRepliesCount();
         }
     },
 
@@ -35,13 +40,13 @@ Thread.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            var hideReplies = function() {
-                self.replyList.unmount();
-                self.renderRepliesCount();
-                self.repliesLoaded = false;
-            };
-
             if (self.repliesLoaded) {
+                var hideReplies = function() {
+                    self.replyList.unmount();
+                    self.renderRepliesCount();
+                    self.repliesLoaded = false;
+                };
+
                 hideReplies();
             } else {
                 var showReplies = function(response) {

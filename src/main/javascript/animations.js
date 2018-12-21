@@ -28,7 +28,7 @@ var expand = function(component, computedHeight, initialHeight) {
     var element = getView(component);
 
     function initiate(timestamp) {
-        if (element.offsetHeight === initialHeight || element.offsetHeight === 0) {
+        if (element.offsetHeight === (initialHeight || 0)) {
             element.style.height = computedHeight + 'px';
             requestAnimationFrame(initiate);
         }
