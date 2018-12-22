@@ -8,20 +8,17 @@ LoadMoreThreads.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            self.unmount();
+            var url = baseUrl + '/api/threads';
+            var params = { params: { cursorAfter: self.cursorAfter } };
 
-            var loader = ui('div', { class: 'loader' });
-            getView(self.threadList).appendChild(loader);
-            updateHeight(self.threadList);
-
-            axios
-                .get(baseUrl + '/api/threads', {
-                    params: { cursorAfter: self.cursorAfter }
-                })
-                .then(function(response) {
-                    getView(self.threadList).removeChild(loader);
+            ajax({
+                before: function() { self.unmount(); },
+                loadingIconContainer: getView(self.threadList),
+                request: axios.get(url, params),
+                success: function(response) {
                     self.threadList.loadMoreThreads(response.data);
-                });
+                }
+            });
         };
     },
 
@@ -38,10 +35,10 @@ LoadMoreThreads.prototype = {
     },
 
     mount: function() {
-        attach(this, this.threadList);
+        getView(this.threadList).appendChild(getView(this));
     },
 
     unmount: function() {
-        detach(this, this.threadList);
+        getView(this.threadList).removeChild(getView(this));
     }
 };

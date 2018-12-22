@@ -10,7 +10,7 @@ ReplyList.prototype = {
         this.props.unshift(data);
 
         var newReply = new Reply(this, data);
-        begin(this, newReply);
+        prependElement(getView(this), getView(newReply));
         updateHeight(this);
     },
 
@@ -46,20 +46,18 @@ ReplyList.prototype = {
     },
 
     mount: function() {
-        var element = getView(this);
-        var computedHeight = computeHeight(element);
-
-        element.style.height = 0;
-        attach(this, this.thread);
-        expand(this, computedHeight);
+        expand({
+            element: getView(this),
+            container: getView(this.thread)
+        });
     },
 
     unmount: function() {
-        var self = this;
-        var callback = function() {
-            detach(self, self.thread);
-        };
-
-        collapse(this, callback);
+        collapse({
+            element: getView(this),
+            after: function(element) {
+                element.parentElement.removeChild(element);
+            }
+        });
     }
 };

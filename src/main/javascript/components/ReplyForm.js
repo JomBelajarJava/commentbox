@@ -74,22 +74,27 @@ ReplyForm.prototype = {
 
     mount: function() {
         var element = getView(this);
-        var computedHeight = computeHeight(element);
-        var initialHeight = this.thread.replyLink.offsetHeight;
+        var replyLink = this.thread.replyLink;
 
-        element.style.height = initialHeight + 'px';
-        replace(this.thread.replyLink, element);
-        expand(this, computedHeight, initialHeight);
+        expand({
+            element: element,
+            initialHeight: replyLink.offsetHeight,
+            before: function() {
+                replaceElement(replyLink, element);
+            }
+        });
     },
 
     unmount: function() {
-        var self = this;
-        var element = getView(self);
-        var finalHeight = computeHeight(self.thread.replyLink);
-        var callback = function() {
-            replace(element, self.thread.replyLink);
-        };
+        var element = getView(this);
+        var replyLink = this.thread.replyLink;
 
-        collapse(self, callback, finalHeight);
+        collapse({
+            element: element,
+            finalHeight: computeHeight(replyLink),
+            after: function() {
+                replaceElement(element, replyLink);
+            }
+        });
     },
 };

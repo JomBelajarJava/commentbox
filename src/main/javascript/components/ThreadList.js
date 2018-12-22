@@ -12,7 +12,7 @@ ThreadList.prototype = {
         this.props.unshift(data);
 
         var newThread = new Thread(this, data);
-        begin(this, newThread);
+        prependElement(getView(this), getView(newThread));
         updateHeight(this);
     },
 
@@ -51,11 +51,6 @@ ThreadList.prototype = {
     },
 
     mount: function() {
-        var element = getView(this);
-        var computedHeight = computeHeight(element);
-
-        element.style.height = 0;
-        attach(this, this.context);
-        expand(this, computedHeight);
+        expand({ element: getView(this) });
     }
 };

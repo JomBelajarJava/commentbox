@@ -19,6 +19,6 @@ Reply.prototype = {
     },
 
     mount: function() {
-        attach(this, this.replyList);
+        getView(this.replyList).appendChild(getView(this));
     }
 };

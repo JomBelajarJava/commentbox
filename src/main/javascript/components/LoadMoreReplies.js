@@ -8,21 +8,18 @@ LoadMoreReplies.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            self.unmount();
-
-            var loader = ui('div', { class: 'loader' });
-            getView(self.replyList).appendChild(loader);
-            updateHeight(self.replyList);
-
-            var url = baseUrl + '/api/thread/' + self.replyList.thread.props.id +
+            var url = baseUrl + '/api/thread/' +
+                self.replyList.thread.props.id +
                 '/comments?cursorAfter=' + self.cursorAfter;
 
-            axios
-                .get(url)
-                .then(function(response) {
-                    getView(self.replyList).removeChild(loader);
+            ajax({
+                before: function() { self.unmount(); },
+                loadingIconContainer: getView(self.replyList),
+                request: axios.get(url),
+                success: function(response) {
                     self.replyList.loadMoreReplies(response.data);
-                });
+                }
+            });
         };
     },
 
@@ -39,10 +36,10 @@ LoadMoreReplies.prototype = {
     },
 
     mount: function() {
-        attach(this, this.replyList);
+        getView(this.replyList).appendChild(getView(this));
     },
 
     unmount: function() {
-        detach(this, this.replyList);
+        getView(this.replyList).removeChild(getView(this));
     }
 };

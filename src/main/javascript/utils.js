@@ -16,43 +16,41 @@ var setView = function(component, element) {
 };
 
 /*
- * Attach component view to another component view (appendChild).
- */
-var attach = function(component, toComponent) {
-    var element = getView(component);
-    var toElement = getView(toComponent);
-    attachElement(element, toElement);
-};
-
-/*
- * Attach HTML element to another element (appendChild).
- */
-var attachElement = function(element, toElement) {
-    toElement.appendChild(element);
-};
-
-/*
- * Detach component view from another component view (removeChild).
- */
-var detach = function(component, from) {
-    getView(from).removeChild(getView(component));
-};
-
-/*
  * Replace element with another element.
  */
-var replace = function(element, withElement) {
+var replaceElement = function(element, withElement) {
     element.parentElement.replaceChild(withElement, element);
 };
 
 /*
- * Put at the beginning of the list, a new component.
+ * Put at the beginning of the list, a new element.
  */
-var begin = function(listComponent, component) {
-    getView(listComponent).insertBefore(
-        getView(component),
-        getView(listComponent).firstChild
-    );
+var prependElement = function(listElement, element) {
+    listElement.insertBefore(element, listElement.firstChild);
+};
+
+/*
+ * Helper function to swap loading icon during ajax request.
+ */
+var ajax = function(args) {
+    // Destructuring args.
+    var loadingIconContainer = args.loadingIconContainer;  // required
+    var request = args.request;  // required
+    var success = args.success;  // required
+    var before = args.before || function(){};
+    var after = args.after || function(){};
+
+    before(loadingIconContainer);
+
+    var loader = ui('div', { class: 'loader' });
+    loadingIconContainer.appendChild(loader);
+
+    request
+        .then(function(response) {
+            loadingIconContainer.removeChild(loader);
+            success(response);
+            after(loadingIconContainer);
+        });
 };
 
 /*
