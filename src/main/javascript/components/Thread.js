@@ -12,8 +12,6 @@ function Thread(threadList, thread) {
 
 Thread.prototype = {
     renderRepliesCount: function() {
-        var textNode = this.viewReplyLink.firstChild;
-
         var selectText = function(count) {
             if (count === 0) {
                 return '';
@@ -24,7 +22,9 @@ Thread.prototype = {
             }
         };
 
-        textNode.nodeValue = selectText(this.props.repliesCount);
+        // firstChild is the TextNode.
+        this.viewReplyLink.firstChild.nodeValue =
+            selectText(this.props.repliesCount);
     },
 
     addReply: function(reply) {
@@ -42,44 +42,36 @@ Thread.prototype = {
             evt.preventDefault();
 
             if (self.repliesLoaded) {
-                var hideReplies = function() {
-                    self.replyList.unmount();
-                    self.renderRepliesCount();
-                    self.repliesLoaded = false;
-                };
-
-                hideReplies();
+                // Hide replies.
+                self.replyList.unmount();
+                self.renderRepliesCount();
+                self.repliesLoaded = false;
             } else {
-                var loader = ui('div', { class: 'loader' });
+                // Show replies from ajax request.
+                var url = baseUrl + '/api/thread/' +
+                    self.props.id + '/comments/earliest';
 
-                // Set height so it will have fixed height, therefore the loader
-                // will not push the other element.
-                self.viewReply.style.height = self.viewReply.offsetHeight + 'px';
-
-                self.viewReply.removeChild(self.viewReplyLink);
-                self.viewReply.appendChild(loader);
-
-                var showReplies = function(response) {
-                    var replies = response.data;
-
-                    self.replyList = new ReplyList(self, replies);
-                    self.replyList.mount();
-                    self.viewReplyLink.firstChild.nodeValue = 'Hide replies';
-
-                    self.viewReply.removeChild(loader);
-                    self.viewReply.appendChild(self.viewReplyLink);
-
-                    self.repliesLoaded = true;
-
-                    updateHeight(self.threadList);
-                };
-
-                var url = baseUrl + '/api/thread/' + self.props.id +
-                    '/comments/earliest';
-
-                axios
-                    .get(url)
-                    .then(showReplies);
+                ajax({
+                    loadingIconContainer: self.viewReply,
+                    request: axios.get(url),
+                    before: function(loadingIconContainer) {
+                        // Set height so it will have fixed height, therefore
+                        // the loader will not push the other element.
+                        loadingIconContainer.style.height =
+                            self.viewReply.offsetHeight + 'px';
+                        loadingIconContainer.removeChild(self.viewReplyLink);
+                    },
+                    success: function(response) {
+                        self.replyList = new ReplyList(self, response.data);
+                        self.replyList.mount();
+                    },
+                    after: function(loadingIconContainer) {
+                        loadingIconContainer.appendChild(self.viewReplyLink);
+                        self.viewReplyLink.firstChild.nodeValue = 'Hide replies';
+                        updateHeight(self.threadList);
+                        self.repliesLoaded = true;
+                    }
+                });
             }
         };
     },
@@ -111,19 +103,16 @@ Thread.prototype = {
                                 text: 'Reply'
                             }));
 
-        var attr = null;
-        if (this.props.isRecent) {
-            attr = { class: 'recent' };
-        }
+        var attr = this.props.isRecent ? { class: 'recent' } : null;
 
         setView(this,
-            ui('li', attr, [
-                ui('p', null, ui('b', { text: this.props.username })),
-                ui('p', { text: this.props.text }),
-                this.replyLink,
-                this.viewReply
-            ])
-        );
+                ui('li', attr, [
+                    ui('p', null, ui('b', { text: this.props.username })),
+                    ui('p', { text: this.props.text }),
+                    this.replyLink,
+                    this.viewReply
+                ])
+               );
     },
 
     mount: function() {

@@ -25,14 +25,14 @@ LoadMoreReplies.prototype = {
 
     render: function() {
         setView(this,
-            ui('li', { class: 'load-more' },
-               ui('a', {
-                   href: '#',
-                   onclick: this.loadMoreListener(this),
-                   text: 'Load more replies'
-               })
-              )
-        );
+                ui('li', { class: 'load-more' },
+                   ui('a', {
+                       href: '#',
+                       onclick: this.loadMoreListener(this),
+                       text: 'Load more replies'
+                   })
+                  )
+               );
     },
 
     mount: function() {

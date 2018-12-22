@@ -47,12 +47,13 @@ ThreadForm.prototype = {
         });
 
         setView(this,
-            ui('div', null, [
-                ui('p', null, this.usernameInput),
-                ui('p', null, this.commentInput),
-                ui('p', { class: 'form-buttons-container' }, this.submitButton)
-            ])
-        );
+                ui('div', null, [
+                    ui('p', null, this.usernameInput),
+                    ui('p', null, this.commentInput),
+                    ui('p', { class: 'form-buttons-container' },
+                       this.submitButton)
+                ])
+               );
     },
 
     mount: function () {

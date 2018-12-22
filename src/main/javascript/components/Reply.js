@@ -5,17 +5,14 @@ function Reply(replyList, reply) {
 
 Reply.prototype = {
     render: function() {
-        var attr = null;
-        if (this.props.isRecent) {
-            attr = { class: 'recent' };
-        }
+        var attr = this.props.isRecent ? { class: 'recent' } : null;
 
         setView(this,
-            ui('li', attr, [
-                ui('p', null, ui('b', { text: this.props.username })),
-                ui('p', { text: this.props.text })
-            ])
-        );
+                ui('li', attr, [
+                    ui('p', null, ui('b', { text: this.props.username })),
+                    ui('p', { text: this.props.text })
+                ])
+               );
     },
 
     mount: function() {

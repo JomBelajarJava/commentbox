@@ -24,14 +24,14 @@ LoadMoreThreads.prototype = {
 
     render: function() {
         setView(this,
-            ui('li', { class: 'load-more' },
-               ui('a', {
-                   href: '#',
-                   onclick: this.loadMoreListener(this),
-                   text: 'Load more comments'
-               })
-              )
-        );
+                ui('li', { class: 'load-more' },
+                   ui('a', {
+                       href: '#',
+                       onclick: this.loadMoreListener(this),
+                       text: 'Load more comments'
+                   })
+                  )
+               );
     },
 
     mount: function() {
