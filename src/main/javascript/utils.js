@@ -37,12 +37,13 @@ var ajax = function(args) {
     var loadingIconContainer = args.loadingIconContainer;  // required
     var request = args.request;  // required
     var success = args.success;  // required
+    var loaderClass = args.loaderClass || '';
     var before = args.before || function(){};
     var after = args.after || function(){};
 
     before(loadingIconContainer);
 
-    var loader = ui('div', { class: 'loader' });
+    var loader = ui('div', { class: 'loader ' + loaderClass });
     loadingIconContainer.appendChild(loader);
 
     request

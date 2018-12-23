@@ -48,18 +48,17 @@
 }
 
 #jombelajarjava-commentbox .loader {
-    border: 3px solid #f3f3f3;
-    border-left: 3px solid #e099ff;
-    border-right: 3px solid #e099ff;
+    border: .2em solid #f3f3f3;
+    border-left: .2em solid #e099ff;
+    border-right: .2em solid #e099ff;
     border-radius: 50%;
-    width: 25px;
-    height: 25px;
+    width: 1em;
+    height: 1em;
     margin: 0 auto;
     animation: jombelajarjava-spin 1s linear infinite;
 }
-#jombelajarjava-commentbox .loader-container {
-    /* text-align: center; */
-    margin-left: 100px;
+#jombelajarjava-commentbox .loader-right {
+    margin-right: 35px;
 }
 
 @keyframes jombelajarjava-flash {

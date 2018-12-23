@@ -5,6 +5,7 @@ function ThreadForm(context) {
     this.usernameInput = null;
     this.commentInput = null;
     this.submitButton = null;
+    this.submitContainer = null;
 }
 
 ThreadForm.prototype = {
@@ -17,15 +18,25 @@ ThreadForm.prototype = {
                 text: self.commentInput.value
             };
 
-            var showNewThread = function(response) {
-                response.data['isRecent'] = true;
-                self.context.threadList.prepend(response.data);
-                self.commentInput.value = '';
-            };
-
-            axios
-                .post(baseUrl + '/api/thread', data)
-                .then(showNewThread);
+            ajax({
+                loadingIconContainer: self.submitContainer,
+                loaderClass: 'loader-right',
+                request: axios.post(baseUrl + '/api/thread', data),
+                before: function(container) {
+                    // Set height so it will have fixed height, therefore
+                    // the loader will not push the other element.
+                    container.style.height = container.offsetHeight + 'px';
+                    container.removeChild(self.submitButton);
+                },
+                success: function(response) {
+                    response.data['isRecent'] = true;
+                    self.context.threadList.prepend(response.data);
+                },
+                after: function(container) {
+                    container.appendChild(self.submitButton);
+                    self.commentInput.value = '';
+                }
+            });
         };
     },
 
@@ -46,12 +57,15 @@ ThreadForm.prototype = {
             text: 'Post comment'
         });
 
+        this.submitContainer = ui('p', {
+            class: 'form-buttons-container'
+        }, this.submitButton);
+
         setView(this,
                 ui('div', null, [
                     ui('p', null, this.usernameInput),
                     ui('p', null, this.commentInput),
-                    ui('p', { class: 'form-buttons-container' },
-                       this.submitButton)
+                    this.submitContainer
                 ])
                );
     },
