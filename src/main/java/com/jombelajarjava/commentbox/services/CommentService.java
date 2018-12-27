@@ -40,7 +40,8 @@ public class CommentService {
     public Comment addThread(Comment comment) {
         comment.setCreated(Date.from(now()));
         Key<Comment> key = commentRepository.insert(comment);
-        return commentRepository.findThread(key);
+        comment.setId(key.getId());
+        return comment;
     }
 
     public void addReply(Long threadId, Comment comment) {

@@ -34,15 +34,6 @@ public class CommentRepository {
         return take(5, query);
     }
 
-    public Comment findThread(Key<Comment> key) {
-        return ofy()
-                .load()
-                .type(Comment.class)
-                .filterKey(key)
-                .first()
-                .now();
-    }
-
     public List<Comment> findEarliestReplies(Long threadId) {
         Query<Comment> query = ofy()
                 .load()
