@@ -11,6 +11,7 @@ ThreadList.prototype = {
 
         var newThread = new Thread(this, data);
         getView(this).prepend(getView(newThread));
+        getView(newThread).fadeIn(300);
     },
 
     renderLoadMore: function() {
@@ -27,9 +28,14 @@ ThreadList.prototype = {
     loadMoreThreads: function(threads) {
         this.props.concat(threads);
 
+        var element = getView(this);
+        element.height(element.height());
+
         this.loadMore.unmount();
         this.renderThreads(threads);
         this.renderLoadMore();
+
+        element.animate({ height: element.get(0).scrollHeight }, 300);
     },
 
     renderThreads: function(threads) {
@@ -48,5 +54,6 @@ ThreadList.prototype = {
 
     mount: function() {
         getView(this.context).append(getView(this));
+        getView(this).slideDown(300);
     }
 };

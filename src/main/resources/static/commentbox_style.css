@@ -14,8 +14,12 @@
 }
 
 #jombelajarjava-commentbox .thread-list {
+    display: none;  /* Initial display, later shown by javascript */
     padding: 0;
     margin: 0;
+}
+#jombelajarjava-commentbox .reply-list {
+    display: none;  /* Initial display, later shown by javascript */
 }
 #jombelajarjava-commentbox .load-more {
     text-align: center;
@@ -25,6 +29,10 @@
     list-style-type: none;
     padding: 1px 16px;
 }
+#jombelajarjava-commentbox .reply-form {
+    display: none;  /* Initial display, later shown by javascript */
+    padding: 5px;
+}
 #jombelajarjava-commentbox .reply-button {
     text-align: right;
 }
@@ -33,6 +41,7 @@
 }
 
 #jombelajarjava-commentbox .recent {
+    display: none;  /* Initial display, later shown by javascript */
     animation: .3s jombelajarjava-flash 4 alternate;
 }
 

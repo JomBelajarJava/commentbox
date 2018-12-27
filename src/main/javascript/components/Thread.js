@@ -60,8 +60,8 @@ Thread.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            context.replyForm = new ReplyForm(self);
-            context.replyForm.mount();
+            var replyForm = new ReplyForm(self);
+            replyForm.mount();
         };
     },
 

@@ -27,7 +27,7 @@ ReplyForm.prototype = {
                     text: self.replyInput.val(),
                     isRecent: true
                 });
-                self.unmount();
+                self.replyInput.val('');
             };
 
             $.ajax({
@@ -55,7 +55,7 @@ ReplyForm.prototype = {
 
         setView(
             this,
-            ui('div', null, [
+            ui('div', { class: 'reply-form' }, [
                 name,
                 reply,
                 ui('p', { class: 'form-buttons-container' }, [
@@ -75,13 +75,18 @@ ReplyForm.prototype = {
     },
 
     mount: function() {
-        // replace reply link with this form, while keeping events
+        // Replace reply link with this form, while keeping events;
         this.thread.replyLink.before(getView(this)).detach();
+        getView(this).fadeIn(300);
     },
 
     unmount: function() {
-        // replace this form with reply link, while keeping events
-        getView(this).before(this.thread.replyLink).detach();
-        // context.replyForm = null;
+        var element = getView(this);
+        var replyLink = this.thread.replyLink;
+
+        element.fadeOut(300, function() {
+            // Replace this form with reply link, while keeping events.
+            element.before(replyLink).detach();
+        });
     },
 };

@@ -11,6 +11,7 @@ ReplyList.prototype = {
 
         var newReply = new Reply(this, data);
         getView(this).prepend(getView(newReply));
+        getView(newReply).fadeIn(300);
     },
 
     renderLoadMore: function() {
@@ -25,9 +26,14 @@ ReplyList.prototype = {
     },
 
     loadMoreReplies: function(replies) {
+        var element = getView(this);
+        element.height(element.height());
+
         this.loadMore.unmount();
         this.renderReplies(replies);
         this.renderLoadMore();
+
+        element.animate({ height: element.get(0).scrollHeight }, 300);
     },
 
     renderReplies: function(replies) {
@@ -39,17 +45,21 @@ ReplyList.prototype = {
     },
 
     render: function() {
-        setView(this, ui('ul'));
+        setView(this, ui('ul', { class: 'reply-list' }));
         this.renderReplies(this.props);
         this.renderLoadMore();
     },
 
     mount: function() {
         getView(this.thread).append(getView(this));
+        getView(this).slideDown(300);
     },
 
     unmount: function() {
-        getView(this).remove();
-        // this.thread.replyList = null;
+        var element = getView(this);
+
+        element.slideUp(300, function() {
+            element.remove();
+        });
     }
 };

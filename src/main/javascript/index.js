@@ -1,8 +1,7 @@
 var baseUrl = '{{baseUrl}}';
 var context = {
     threadForm: null,
-    threadList: null,
-    replyForm: null
+    threadList: null
 };
 setView(context, $('div#jombelajarjava-commentbox'));
 
