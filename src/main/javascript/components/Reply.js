@@ -5,7 +5,7 @@ function Reply(replyList, reply) {
 
 Reply.prototype = {
     render: function() {
-        var attr = this.props.isRecent ? { class: 'recent-reply' } : null;
+        var attr = this.props.isRecent ? { class: 'recent' } : null;
 
         setView(
             this,
