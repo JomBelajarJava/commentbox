@@ -2,7 +2,7 @@
  * Get view rendered by the component.
  */
 var getView = function(component) {
-    if (component._view === undefined || component._view === null) {
+    if (!component._view) {
         component.render();
     }
     return component._view;
@@ -16,51 +16,21 @@ var setView = function(component, element) {
 };
 
 /*
- * Attach component view to another component view (appendChild).
- */
-var attach = function(component, to) {
-    getView(to).appendChild(getView(component));
-};
-
-/*
- * Detach component view from another component view (removeChild).
- */
-var detach = function(component, from) {
-    getView(from).removeChild(getView(component));
-};
-
-/*
- * Replace element with another element.
- */
-var replace = function(element, withElement) {
-    element.parentElement.replaceChild(withElement, element);
-};
-
-/*
- * Put at the beginning of the list, a new component.
- */
-var begin = function(listComponent, component) {
-    getView(listComponent).insertBefore(
-        getView(component),
-        getView(listComponent).firstChild
-    );
-};
-
-/*
  * Create HTML element from tagName and attributes. 'onclick' attribute will
  * add as event listener. 'text' attribute will be the text node. Other
  * attributes will set as normal attributes.
  */
 var _make = function(tagName, attributes) {
-    var element = document.createElement(tagName);
+    var element = $('<' + tagName + '/>');
     for (var prop in attributes) {
-        if (prop === 'onclick') {
-            element.addEventListener('click', attributes[prop]);
+        if (prop === 'class') {
+            element.addClass(attributes[prop]);
+        } else if (prop === 'onclick') {
+            element.click(attributes[prop]);
         } else if (prop === 'text') {
-            var text = document.createTextNode(attributes[prop]);
-            element.appendChild(text);
+            element.text(attributes[prop]);
         } else {
-            element.setAttribute(prop, attributes[prop]);
+            element.attr(prop, attributes[prop]);
         }
     }
 
@@ -72,7 +42,7 @@ var _make = function(tagName, attributes) {
  */
 var _wrap = function(node, tagName, attributes) {
     var wrapper = _make(tagName, attributes);
-    wrapper.appendChild(node);
+    wrapper.append(node);
 
     return wrapper;
 };
@@ -84,7 +54,7 @@ var _wrap = function(node, tagName, attributes) {
 var _group = function(nodes, tagName, attributes) {
     var group = _make(tagName, attributes);
     for (var i = 0; i < nodes.length; i++) {
-        group.appendChild(nodes[i]);
+        group.append(nodes[i]);
     }
 
     return group;
@@ -94,9 +64,9 @@ var _group = function(nodes, tagName, attributes) {
  * Helper function to create HTML elements.
  */
 var ui = function(tagName, attributes, nodes) {
-    if (nodes === undefined || nodes === null) {
+    if (!nodes) {
         return _make(tagName, attributes);
-    } else if (Array.isArray(nodes)) {
+    } else if ($.isArray(nodes)) {
         return _group(nodes, tagName, attributes);
     } else {
         return _wrap(nodes, tagName, attributes);

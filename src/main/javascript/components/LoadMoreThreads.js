@@ -8,18 +8,18 @@ LoadMoreThreads.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            axios
-                .get(baseUrl + '/api/threads', {
-                    params: { cursorAfter: self.cursorAfter }
-                })
-                .then(function(response) {
-                    self.threadList.loadMoreThreads(response.data);
-                });
+            $.ajax({
+                url: baseUrl + '/api/threads?cursorAfter=' + self.cursorAfter,
+                success: function(data) {
+                    self.threadList.loadMoreThreads(data);
+                }
+            });
         };
     },
 
     render: function() {
-        setView(this,
+        setView(
+            this,
             ui('li', { class: 'load-more' },
                ui('a', {
                    href: '#',
@@ -31,11 +31,11 @@ LoadMoreThreads.prototype = {
     },
 
     mount: function() {
-        attach(this, this.threadList);
+        getView(this.threadList).append(getView(this));
     },
 
     unmount: function() {
-        detach(this, this.threadList);
-        this.threadList.loadMore = null;
+        getView(this).remove();
+        // this.threadList.loadMore = null;
     }
 };

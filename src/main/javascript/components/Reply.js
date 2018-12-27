@@ -5,12 +5,10 @@ function Reply(replyList, reply) {
 
 Reply.prototype = {
     render: function() {
-        var attr = null;
-        if (this.props.isRecent) {
-            attr = { class: 'recent-reply' };
-        }
+        var attr = this.props.isRecent ? { class: 'recent-reply' } : null;
 
-        setView(this,
+        setView(
+            this,
             ui('li', attr, [
                 ui('p', null, ui('b', { text: this.props.username })),
                 ui('p', { text: this.props.text })
@@ -19,6 +17,6 @@ Reply.prototype = {
     },
 
     mount: function() {
-        attach(this, this.replyList);
+        getView(this.replyList).append(getView(this));
     }
 };

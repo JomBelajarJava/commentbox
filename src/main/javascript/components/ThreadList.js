@@ -1,6 +1,4 @@
 function ThreadList(context, threads) {
-    context.threadList = this;
-
     this.context = context;
     this.props = threads;
     this.loadMore = null;
@@ -12,7 +10,7 @@ ThreadList.prototype = {
         this.props.unshift(data);
 
         var newThread = new Thread(this, data);
-        begin(this, newThread);
+        getView(this).prepend(getView(newThread));
     },
 
     renderLoadMore: function() {
@@ -49,6 +47,6 @@ ThreadList.prototype = {
     },
 
     mount: function() {
-        attach(this, this.context);
+        getView(this.context).append(getView(this));
     }
 };

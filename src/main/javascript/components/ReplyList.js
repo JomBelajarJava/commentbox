@@ -10,7 +10,7 @@ ReplyList.prototype = {
         this.props.unshift(data);
 
         var newReply = new Reply(this, data);
-        begin(this, newReply);
+        getView(this).prepend(getView(newReply));
     },
 
     renderLoadMore: function() {
@@ -45,11 +45,11 @@ ReplyList.prototype = {
     },
 
     mount: function() {
-        attach(this, this.thread);
+        getView(this.thread).append(getView(this));
     },
 
     unmount: function() {
-        detach(this, this.thread);
-        this.thread.replyList = null;
+        getView(this).remove();
+        // this.thread.replyList = null;
     }
 };

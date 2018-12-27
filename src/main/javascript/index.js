@@ -4,21 +4,22 @@ var context = {
     threadList: null,
     replyForm: null
 };
-setView(context, document.querySelector('div#jombelajarjava-commentbox'));
+setView(context, $('div#jombelajarjava-commentbox'));
 
 /*
  * Initialize comment box.
  */
 var init = function() {
-    var threadForm = new ThreadForm(context);
-    threadForm.mount();
+    context.threadForm = new ThreadForm(context);
+    context.threadForm.mount();
 
-    axios
-        .get(baseUrl + '/api/threads/latest')
-        .then(function(response) {
-            var threadList = new ThreadList(context, response.data);
-            threadList.mount();
-        });
+    $.ajax({
+        url: baseUrl + '/api/threads/latest',
+        success: function(data) {
+            context.threadList = new ThreadList(context, data);
+            context.threadList.mount();
+        }
+    });
 };
 
 init();

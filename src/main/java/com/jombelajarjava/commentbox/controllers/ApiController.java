@@ -42,12 +42,12 @@ public class ApiController {
      */
 
     @PostMapping("/api/thread")
-    public Comment openThread(@RequestBody Comment comment) {
+    public Comment openThread(@ModelAttribute Comment comment) {
         return commentService.addThread(comment);
     }
 
     @PostMapping("/api/thread/{threadId}/comment")
-    public String  sendReply(@PathVariable Long threadId, @RequestBody Comment comment) {
+    public String  sendReply(@PathVariable Long threadId, @ModelAttribute Comment comment) {
         commentService.addReply(threadId, comment);
         return "";
     }

@@ -1,6 +1,4 @@
 function ThreadForm(context) {
-    context.threadForm = this;
-
     this.context = context;
     this.usernameInput = null;
     this.commentInput = null;
@@ -13,18 +11,21 @@ ThreadForm.prototype = {
             evt.preventDefault();
 
             var data = {
-                username: self.usernameInput.value,
-                text: self.commentInput.value
+                username: self.usernameInput.val(),
+                text: self.commentInput.val()
             };
 
-            var showNewThread = function(response) {
-                self.context.threadList.prepend(response.data);
-                self.commentInput.value = '';
+            var showNewThread = function(data) {
+                self.context.threadList.prepend(data);
+                self.commentInput.val('');
             };
 
-            axios
-                .post(baseUrl + '/api/thread', data)
-                .then(showNewThread);
+            $.ajax({
+                method: 'POST',
+                url: baseUrl + '/api/thread',
+                data: data,
+                success: showNewThread
+            });
         };
     },
 
@@ -45,7 +46,8 @@ ThreadForm.prototype = {
             text: 'Post comment'
         });
 
-        setView(this,
+        setView(
+            this,
             ui('div', null, [
                 ui('p', null, this.usernameInput),
                 ui('p', null, this.commentInput),
@@ -54,7 +56,7 @@ ThreadForm.prototype = {
         );
     },
 
-    mount: function () {
-        attach(this, this.context);
+    mount: function() {
+        getView(this.context).append(getView(this));
     }
 };

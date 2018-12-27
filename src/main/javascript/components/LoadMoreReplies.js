@@ -8,19 +8,21 @@ LoadMoreReplies.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            var url = baseUrl + '/api/thread/' + self.replyList.thread.props.id +
-                '/comments?cursorAfter=' + self.cursorAfter;
+            var threadId = self.replyList.thread.props.id;
 
-            axios
-                .get(url)
-                .then(function(response) {
-                    self.replyList.loadMoreReplies(response.data);
-                });
+            $.ajax({
+                url: baseUrl + '/api/thread/' + threadId +
+                    '/comments?cursorAfter=' + self.cursorAfter,
+                success: function(data) {
+                    self.replyList.loadMoreReplies(data);
+                }
+            });
         };
     },
 
     render: function() {
-        setView(this,
+        setView(
+            this,
             ui('li', { class: 'load-more' },
                ui('a', {
                    href: '#',
@@ -32,11 +34,11 @@ LoadMoreReplies.prototype = {
     },
 
     mount: function() {
-        attach(this, this.replyList);
+        getView(this.replyList).append(getView(this));
     },
 
     unmount: function() {
-        detach(this, this.replyList);
-        this.replyList.loadMore = null;
+        getView(this).remove();
+        // this.replyList.loadMore = null;
     }
 };

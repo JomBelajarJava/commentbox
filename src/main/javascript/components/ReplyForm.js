@@ -16,25 +16,26 @@ ReplyForm.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            var url = baseUrl + '/api/thread/' + self.thread.props.id + '/comment';
-
             var data = {
-                username: self.nameInput.value,
-                text: self.replyInput.value
+                username: self.nameInput.val(),
+                text: self.replyInput.val()
             };
 
             var showSubmittedReply = function() {
                 self.thread.addReply({
-                    username: self.nameInput.value,
-                    text: self.replyInput.value,
+                    username: self.nameInput.val(),
+                    text: self.replyInput.val(),
                     isRecent: true
                 });
                 self.unmount();
             };
 
-            axios
-                .post(url, data)
-                .then(showSubmittedReply);
+            $.ajax({
+                method: 'POST',
+                url: baseUrl + '/api/thread/' + self.thread.props.id + '/comment',
+                data: data,
+                success: showSubmittedReply
+            });
         };
     },
 
@@ -52,7 +53,8 @@ ReplyForm.prototype = {
         var name = ui('p', null, this.nameInput);
         var reply = ui('p', null, this.replyInput);
 
-        setView(this,
+        setView(
+            this,
             ui('div', null, [
                 name,
                 reply,
@@ -73,11 +75,13 @@ ReplyForm.prototype = {
     },
 
     mount: function() {
-        replace(this.thread.replyLink, getView(this));
+        // replace reply link with this form, while keeping events
+        this.thread.replyLink.before(getView(this)).detach();
     },
 
     unmount: function() {
-        replace(getView(this), this.thread.replyLink);
-        context.replyForm = null;
+        // replace this form with reply link, while keeping events
+        getView(this).before(this.thread.replyLink).detach();
+        // context.replyForm = null;
     },
 };

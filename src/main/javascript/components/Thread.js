@@ -10,24 +10,24 @@ function Thread(threadList, thread) {
 
 Thread.prototype = {
     renderRepliesCount: function() {
-        var textNode = this.viewReplyLink.firstChild;
+        var selectWords = function(count) {
+            switch (count) {
+            case 0: return '';
+            case 1: return 'View reply';
+            default: return 'View ' + count + ' replies';
+            }
+        };
 
-        if (this.props.repliesCount === 0) {
-            textNode.nodeValue = '';
-        } else if (this.props.repliesCount === 1) {
-            textNode.nodeValue = 'View reply';
-        } else {
-            textNode.nodeValue = 'View ' + this.props.repliesCount + ' replies';
-        }
+        this.viewReplyLink.text(selectWords(this.props.repliesCount));
     },
 
     addReply: function(reply) {
         this.props.repliesCount++;
 
-        if (this.replyList === null) {  // if replyList is not shown
-            this.renderRepliesCount();
-        } else {
+        if (this.repliesLoaded) {
             this.replyList.prepend(reply);
+        } else {
+            this.renderRepliesCount();
         }
     },
 
@@ -36,25 +36,22 @@ Thread.prototype = {
             evt.preventDefault();
 
             if (self.repliesLoaded) {
+                // Hide replies
                 self.replyList.unmount();
                 self.renderRepliesCount();
                 self.repliesLoaded = false;
             } else {
-                var showReplies = function(response) {
-                    var replies = response.data;
-
-                    self.replyList = new ReplyList(self, replies);
-                    self.replyList.mount();
-                    self.viewReplyLink.firstChild.nodeValue = 'Hide replies';
-                    self.repliesLoaded = true;
-                };
-
-                var url = baseUrl + '/api/thread/' + self.props.id +
-                    '/comments/earliest';
-
-                axios
-                    .get(url)
-                    .then(showReplies);
+                // Show replies
+                $.ajax({
+                    url: baseUrl + '/api/thread/'
+                        + self.props.id + '/comments/earliest',
+                    success: function(replies) {
+                        self.replyList = new ReplyList(self, replies);
+                        self.replyList.mount();
+                        self.viewReplyLink.text('Hide replies');
+                        self.repliesLoaded = true;
+                    }
+                });
             }
         };
     },
@@ -63,9 +60,6 @@ Thread.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            if (context.replyForm !== null) {
-                context.replyForm.unmount();
-            }
             context.replyForm = new ReplyForm(self);
             context.replyForm.mount();
         };
@@ -74,8 +68,7 @@ Thread.prototype = {
     render: function() {
         this.viewReplyLink = ui('a', {
             href: '#',
-            onclick: this.viewReplyListener(this),
-            text: ''  // append textnode, required for renderRepliesCount()
+            onclick: this.viewReplyListener(this)
         });
         this.renderRepliesCount();
 
@@ -86,7 +79,8 @@ Thread.prototype = {
                                 text: 'Reply'
                             }));
 
-        setView(this,
+        setView(
+            this,
             ui('li', null, [
                 ui('p', null, ui('b', { text: this.props.username })),
                 ui('p', { text: this.props.text }),
@@ -97,6 +91,6 @@ Thread.prototype = {
     },
 
     mount: function() {
-        attach(this, this.threadList);
+        getView(this.threadList).append(getView(this));
     }
 };
