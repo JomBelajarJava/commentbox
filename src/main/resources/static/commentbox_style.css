@@ -45,7 +45,25 @@
     animation: .3s jombelajarjava-flash 4 alternate;
 }
 
+#jombelajarjava-commentbox .loader {
+    border: .2em solid #f3f3f3;
+    border-left: .2em solid #e099ff;
+    border-right: .2em solid #e099ff;
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    margin: 0 auto;
+    animation: jombelajarjava-spin 1s linear infinite;
+}
+#jombelajarjava-commentbox .loader-right {
+    margin-right: 35px;
+}
+
 @keyframes jombelajarjava-flash {
     from { background-color: inherit; }
     to { background-color: #bdffbd; }
+}
+@keyframes jombelajarjava-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

@@ -42,6 +42,17 @@ Thread.prototype = {
                 self.repliesLoaded = false;
             } else {
                 // Show replies
+
+                var loadingIcon = ui('div', { class: 'loader' });
+
+                // Explicitly set height so the loading icon will not push other
+                // elements.
+                var container = self.viewReplyLink.parent();
+                container.height(container.height());
+
+                // Replace view reply link with loading icon.
+                self.viewReplyLink.before(loadingIcon).detach();
+
                 $.ajax({
                     url: baseUrl + '/api/thread/'
                         + self.props.id + '/comments/earliest',
@@ -50,6 +61,9 @@ Thread.prototype = {
                         self.replyList.mount();
                         self.viewReplyLink.text('Hide replies');
                         self.repliesLoaded = true;
+
+                        // Replace loading icon back to view reply link.
+                        loadingIcon.before(self.viewReplyLink).remove();
                     }
                 });
             }

@@ -18,7 +18,7 @@ ThreadList.prototype = {
         if (this.threads.length > 0) {
             var lastThread = this.threads[this.threads.length - 1];
             var cursorAfter = lastThread.props.cursorAfter;
-            if (cursorAfter !== null) {
+            if (cursorAfter) {
                 this.loadMore = new LoadMoreThreads(this, cursorAfter);
                 this.loadMore.mount();
             }
@@ -28,6 +28,7 @@ ThreadList.prototype = {
     loadMoreThreads: function(threads) {
         this.props.concat(threads);
 
+        // Explicitly set height as initial position for animation.
         var element = getView(this);
         element.height(element.height());
 

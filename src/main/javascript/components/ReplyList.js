@@ -18,7 +18,8 @@ ReplyList.prototype = {
         if (this.replies.length > 0) {
             var lastReply = this.replies[this.replies.length - 1];
             var cursorAfter = lastReply.props.cursorAfter;
-            if (cursorAfter !== null) {
+
+            if (cursorAfter) {
                 this.loadMore = new LoadMoreReplies(this, cursorAfter);
                 this.loadMore.mount();
             }
@@ -27,6 +28,8 @@ ReplyList.prototype = {
 
     loadMoreReplies: function(replies) {
         var element = getView(this);
+
+        // Explicitly set height for initial animation position.
         element.height(element.height());
 
         this.loadMore.unmount();

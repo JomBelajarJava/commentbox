@@ -10,22 +10,31 @@ ThreadForm.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            var data = {
-                username: self.usernameInput.val(),
-                text: self.commentInput.val()
-            };
+            var loadingIcon = ui('div', { class: 'loader loader-right' });
 
-            var showNewThread = function(data) {
-                data['isRecent'] = true;
-                self.context.threadList.prepend(data);
-                self.commentInput.val('');
-            };
+            // Explicitly set height so the loading icon will not move the
+            // elements.
+            var container = self.submitButton.parent();
+            container.height(container.height());
+
+            // Replace submit button with loading icon.
+            self.submitButton.before(loadingIcon).detach();
 
             $.ajax({
                 method: 'POST',
                 url: baseUrl + '/api/thread',
-                data: data,
-                success: showNewThread
+                data: {
+                    username: self.usernameInput.val(),
+                    text: self.commentInput.val()
+                },
+                success: function(data) {
+                    data['isRecent'] = true;
+                    self.context.threadList.prepend(data);
+                    self.commentInput.val('');
+
+                    // Replace back loading icon with submit button.
+                    loadingIcon.before(self.submitButton).remove();
+                }
             });
         };
     },

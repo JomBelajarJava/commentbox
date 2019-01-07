@@ -16,25 +16,37 @@ ReplyForm.prototype = {
         return function(evt) {
             evt.preventDefault();
 
-            var data = {
-                username: self.nameInput.val(),
-                text: self.replyInput.val()
-            };
+            var buttonsContainer = $(evt.target).parent();
+            var buttons = buttonsContainer.children();
+            var loadingIcon = ui('div', { class: 'loader loader-right' });
 
-            var showSubmittedReply = function() {
-                self.thread.addReply({
-                    username: self.nameInput.val(),
-                    text: self.replyInput.val(),
-                    isRecent: true
-                });
-                self.replyInput.val('');
-            };
+            // Explicitly set height so the loading icon will not move the
+            // elements.
+            buttonsContainer.height(buttonsContainer.height());
+
+            // Replace buttons with loading icon.
+            buttons.detach();
+            buttonsContainer.append(loadingIcon);
 
             $.ajax({
                 method: 'POST',
                 url: baseUrl + '/api/thread/' + self.thread.props.id + '/comment',
-                data: data,
-                success: showSubmittedReply
+                data: {
+                    username: self.nameInput.val(),
+                    text: self.replyInput.val()
+                },
+                success: function() {
+                    self.thread.addReply({
+                        username: self.nameInput.val(),
+                        text: self.replyInput.val(),
+                        isRecent: true
+                    });
+                    self.replyInput.val('');
+
+                    // Replace back loading icon with submit button.
+                    loadingIcon.remove();
+                    buttonsContainer.append(buttons);
+                }
             });
         };
     },
@@ -85,8 +97,8 @@ ReplyForm.prototype = {
         var replyLink = this.thread.replyLink;
 
         element.fadeOut(300, function() {
-            // Replace this form with reply link, while keeping events.
-            element.before(replyLink).detach();
+            // Replace this form with reply link.
+            element.before(replyLink).remove();
         });
     },
 };
